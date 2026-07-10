@@ -1,0 +1,121 @@
+/* Theme Typography */
+
+@theme inline {
+  --font-inter: var(--font-inter);
+  --font-inter-tight: var(--font-inter-tight);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-tight: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --container-page: 1240px;
+
+  --spacing-page-x: 24px;
+  --spacing-section-y: 64px;
+}
+
+:root {
+  /* Heading */
+  --text-heading-1: 48px;
+  --text-heading-2: 40px;
+  --text-heading-3: 32px;
+  --text-heading-4: 24px;
+  --text-heading-5: 20px;
+  --text-heading-6: 18px;
+
+  --leading-heading-1: 58px;
+  --leading-heading-2: 48px;
+  --leading-heading-3: 40px;
+  --leading-heading-4: 32px;
+  --leading-heading-5: 24px;
+  --leading-heading-6: 22px;
+
+  /* Body */
+  --text-body-xl: 18px;
+  --text-body-lg: 16px;
+  --text-body-md: 14px;
+  --text-body-sm: 12px;
+
+  --leading-body-xl: 28px;
+  --leading-body-lg: 24px;
+  --leading-body-md: 20px;
+  --leading-body-sm: 18px;
+
+  /* Label / uppercase */
+  --text-label-lg: 16px;
+  --text-label-md: 14px;
+  --text-label-sm: 12px;
+
+  --leading-label-lg: 24px;
+  --leading-label-md: 20px;
+  --leading-label-sm: 16px;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --text-heading-1: 56px;
+    --text-heading-2: 48px;
+    --text-heading-3: 40px;
+    --text-heading-4: 32px;
+    --text-heading-5: 24px;
+    --text-heading-6: 20px;
+
+    --leading-heading-1: 67px;
+    --leading-heading-2: 58px;
+    --leading-heading-3: 48px;
+    --leading-heading-4: 40px;
+    --leading-heading-5: 29px;
+    --leading-heading-6: 24px;
+
+    --spacing-page-x: 96px;
+    --spacing-section-y: 96px;
+  }
+}
+
+@layer utilities {
+  .text-heading-1 {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-1);
+    line-height: var(--leading-heading-1);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .text-heading-3 {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-3);
+    line-height: var(--leading-heading-3);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+  }
+
+  .text-body-xl {
+    font-family: var(--font-inter);
+    font-size: var(--text-body-xl);
+    line-height: var(--leading-body-xl);
+    font-weight: 400;
+  }
+
+  .text-body-lg {
+    font-family: var(--font-inter);
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body-lg);
+    font-weight: 400;
+  }
+
+  .text-body-md {
+    font-family: var(--font-inter);
+    font-size: var(--text-body-md);
+    line-height: var(--leading-body-md);
+    font-weight: 400;
+  }
+
+  .text-label-lg {
+    font-family: var(--font-inter);
+    font-size: var(--text-label-lg);
+    line-height: var(--leading-label-lg);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}

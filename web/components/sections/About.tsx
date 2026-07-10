@@ -1,0 +1,196 @@
+import Image from "next/image";
+import Link from "next/link";
+import { MdArrowOutward } from "react-icons/md";
+
+import { Container } from "@/components/ui/Container";
+import { getButtonHref } from "@/lib/button";
+import { urlFor } from "@/lib/sanity/image";
+import { cn } from "@/lib/utils";
+import type { Homepage } from "@/types/homepage";
+
+type AboutData = Homepage["about"];
+
+type AboutProps = {
+  data?: AboutData;
+  className?: string;
+};
+
+type AboutButtonProps = {
+  button?: NonNullable<AboutData>["button"];
+};
+
+function hasAboutContent(data?: AboutData) {
+  return Boolean(
+    data?.sectionLabel || data?.headline || data?.button?.label || data?.image,
+  );
+}
+
+function getHeadlineParts(headline?: string) {
+  const value = headline?.trim();
+
+  if (!value) return null;
+
+  const firstSentenceEnd = value.indexOf(". ");
+
+  if (firstSentenceEnd === -1) {
+    return {
+      muted: "",
+      strong: value,
+    };
+  }
+
+  return {
+    muted: value.slice(0, firstSentenceEnd + 1),
+    strong: value.slice(firstSentenceEnd + 2),
+  };
+}
+
+function AboutButton({ button }: AboutButtonProps) {
+  if (!button?.label) return null;
+
+  const href = getButtonHref(button);
+  const isExternalHref =
+    href.startsWith("http") ||
+    href.startsWith("mailto:") ||
+    href.startsWith("tel:");
+
+  const className =
+    "inline-flex items-center justify-center gap-2 text-lg font-normal leading-[150%] text-[var(--color-gray-900)] font-inter transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-700 focus-visible:ring-offset-4";
+
+  const content = (
+    <>
+      <span>{button.label}</span>
+      <MdArrowOutward className="h-6 w-6 text-black" aria-hidden="true" />
+    </>
+  );
+
+  if (isExternalHref) {
+    return (
+      <a
+        href={href}
+        target={
+          button.openInNewTab && href.startsWith("http") ? "_blank" : undefined
+        }
+        rel={
+          button.openInNewTab && href.startsWith("http")
+            ? "noreferrer"
+            : undefined
+        }
+        className={className}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link
+      href={href}
+      target={button.openInNewTab ? "_blank" : undefined}
+      rel={button.openInNewTab ? "noreferrer" : undefined}
+      className={className}
+    >
+      {content}
+    </Link>
+  );
+}
+
+function AboutHeadline({
+  headline,
+  className,
+}: {
+  headline?: string;
+  className?: string;
+}) {
+  const parts = getHeadlineParts(headline);
+
+  if (!parts) return null;
+
+  return (
+    <p
+      className={cn(
+        "w-full font-inter text-[28px] font-normal leading-[140%] md:text-4xl lg:max-w-[775px] lg:text-[40px]",
+        className,
+      )}
+    >
+      {parts.muted ? (
+        <span className="text-[var(--color-gray-500)]">{parts.muted} </span>
+      ) : null}
+      <span className="text-[var(--color-gray-900)]">{parts.strong}</span>
+    </p>
+  );
+}
+
+function AboutImage({ image }: { image?: NonNullable<AboutData>["image"] }) {
+  if (!image) return null;
+
+  const imageUrl = urlFor(image)
+    .width(2880)
+    .height(800)
+    .fit("crop")
+    .auto("format")
+    .url();
+
+  return (
+    <div className="relative left-1/2 h-72 w-screen -translate-x-1/2 overflow-hidden bg-zinc-100 md:h-96">
+      <Image
+        src={imageUrl}
+        alt="About image"
+        fill
+        sizes="100vw"
+        className="object-cover"
+      />
+    </div>
+  );
+}
+
+function AboutDesktop({ data }: { data?: AboutData }) {
+  return (
+    <div className="hidden w-full items-start justify-between gap-16 lg:flex">
+      <div className="flex w-80 shrink-0 self-stretch flex-col items-start justify-between">
+        {data?.sectionLabel ? (
+          <p className="text-2xl font-medium uppercase leading-[120%] text-[var(--color-gray-700)] font-inter">
+            {data.sectionLabel}
+          </p>
+        ) : null}
+
+        <AboutButton button={data?.button} />
+      </div>
+
+      <AboutHeadline headline={data?.headline} />
+    </div>
+  );
+}
+
+function AboutResponsive({ data }: { data?: AboutData }) {
+  return (
+    <div className="flex w-full flex-col items-start gap-10 md:gap-14 lg:hidden">
+      {data?.sectionLabel ? (
+        <p className="text-2xl font-medium uppercase leading-[120%] text-[var(--color-gray-700)] font-inter md:text-2xl md:leading-[120%]">
+          {data.sectionLabel}
+        </p>
+      ) : null}
+
+      <AboutHeadline headline={data?.headline} />
+
+      <AboutButton button={data?.button} />
+    </div>
+  );
+}
+
+export function About({ data, className }: AboutProps) {
+  if (!hasAboutContent(data)) return null;
+
+  return (
+    <section className={cn("w-full overflow-hidden bg-white", className)}>
+      <div className="py-10 md:py-14 lg:py-24">
+        <Container>
+          <AboutDesktop data={data} />
+          <AboutResponsive data={data} />
+        </Container>
+      </div>
+
+      <AboutImage image={data?.image} />
+    </section>
+  );
+}

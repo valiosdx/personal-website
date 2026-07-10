@@ -1,0 +1,82 @@
+/* Theme Colors */
+
+@theme {
+  /* Primary */
+  --color-primary-50: #f5f3fe;
+  --color-primary-100: #ece9fc;
+  --color-primary-200: #dcd6fb;
+  --color-primary-300: #c1b6f8;
+  --color-primary-400: #a38cf3;
+  --color-primary-500: #334338;
+
+  /* Grayscale */
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #f2f5f9;
+  --color-gray-200: #dbdee2;
+  --color-gray-300: #cdd5e0;
+  --color-gray-400: #97a3b6;
+  --color-gray-500: #929aa6;
+  --color-gray-600: #616d7f;
+  --color-gray-700: #616d7f;
+  --color-gray-800: #20293a;
+  --color-gray-900: #0d1f3a;
+
+  /* Base */
+  --color-base-white: #ffffff;
+  --color-base-black: #000000;
+
+  /* Success */
+  --color-success-50: #def5ed;
+  --color-success-100: #c6eee1;
+  --color-success-300: #87dcc0;
+  --color-success-400: #42d0a1;
+  --color-success-500: #049f6c;
+  --color-success-700: #096b4b;
+
+  /* Info */
+  --color-info-50: #ebf2fe;
+  --color-info-100: #d8e6fd;
+  --color-info-300: #9dc1fb;
+  --color-info-400: #71a4f5;
+  --color-info-500: #3b82f6;
+  --color-info-700: #0950c3;
+
+  /* Warning */
+  --color-warning-50: #fff6e0;
+  --color-warning-100: #ffebc9;
+  --color-warning-200: #ffdea6;
+  --color-warning-400: #ffbe4c;
+  --color-warning-500: #f29c06;
+  --color-warning-700: #be7a03;
+
+  /* Danger */
+  --color-danger-50: #fff0f3;
+  --color-danger-100: #fadbe1;
+  --color-danger-300: #ed8296;
+  --color-danger-400: #f54b6b;
+  --color-danger-500: #df1c41;
+  --color-danger-800: #710e21;
+}
+
+:root {
+  --color-background: var(--color-base-white);
+  --color-foreground: var(--color-gray-900);
+
+  --color-surface: var(--color-base-white);
+  --color-surface-muted: var(--color-gray-50);
+  --color-surface-dark: var(--color-gray-700);
+
+  --color-muted: var(--color-gray-500);
+  --color-muted-foreground: var(--color-gray-400);
+
+  --color-border: var(--color-gray-200);
+  --color-border-strong: var(--color-gray-300);
+
+  --color-accent: var(--color-gray-700);
+  --color-accent-hover: var(--color-gray-800);
+  --color-accent-foreground: var(--color-base-white);
+
+  --shadow-card:
+    0px 1px 2px 0px rgba(12, 17, 28, 0.08),
+    0px 1px 3px 0px rgba(12, 17, 28, 0.04);
+}
