@@ -1,4 +1,6 @@
+import { useEffect, useCallback } from "react";
 import Image from "next/image";
+import { motion, useReducedMotion, useAnimationControls } from "framer-motion";
 
 import { urlFor } from "@/lib/sanity/image";
 import { cn } from "@/lib/utils";
@@ -62,10 +64,33 @@ function BrandLogo({ brand }: { brand: BrandWithLogo }) {
   return <div className={className}>{logo}</div>;
 }
 
+const SPEED_PER_ITEM = 4;
+
 export function BrandSlider({ data, className }: BrandSliderProps) {
   const brands: BrandWithLogo[] = (data?.brands ?? []).filter(hasLogo);
+  const prefersReducedMotion = useReducedMotion();
+  const controls = useAnimationControls();
+
+  const runAnimation = useCallback(() => {
+    if (prefersReducedMotion || !brands.length) return;
+    const duration = brands.length * SPEED_PER_ITEM;
+    controls.start({
+      x: "-50%",
+      transition: { repeat: Infinity, repeatType: "loop", duration, ease: "linear" },
+    });
+  }, [controls, brands.length, prefersReducedMotion]);
+
+  useEffect(() => {
+    runAnimation();
+    return () => { controls.stop(); };
+  }, [runAnimation, controls]);
+
+  const onHoverStart = useCallback(() => controls.stop(), [controls]);
+  const onHoverEnd = useCallback(() => runAnimation(), [runAnimation]);
 
   if (!brands.length) return null;
+
+  const duplicated = [...brands, ...brands];
 
   return (
     <section
@@ -74,16 +99,20 @@ export function BrandSlider({ data, className }: BrandSliderProps) {
         className,
       )}
     >
-      <div className="flex w-screen justify-center overflow-visible">
-        <div className="flex w-max min-w-max shrink-0 items-center justify-center">
-          {brands.map((brand, index) => (
-            <BrandLogo
-              key={brand._key ?? `${brand.alt}-${index}`}
-              brand={brand}
-            />
-          ))}
-        </div>
-      </div>
+      <motion.div
+        className="flex w-max shrink-0 items-center"
+        animate={controls}
+        onHoverStart={prefersReducedMotion ? undefined : onHoverStart}
+        onHoverEnd={prefersReducedMotion ? undefined : onHoverEnd}
+        style={{ willChange: "transform" }}
+      >
+        {duplicated.map((brand, index) => (
+          <BrandLogo
+            key={brand._key ?? `${brand.alt}-${index}`}
+            brand={brand}
+          />
+        ))}
+      </motion.div>
 
       <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-linear-to-r from-white to-white/0 md:w-44" />
       <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-linear-to-l from-white to-white/0 md:w-44" />

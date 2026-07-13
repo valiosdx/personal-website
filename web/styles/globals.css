@@ -84,9 +84,3 @@ body {
   opacity: 24%;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .brand-slider-track {
-    animation: none;
-    transform: none;
-  }
-}
