@@ -127,7 +127,7 @@ function HeroImage({ imageUrl, title }: HeroImageProps) {
         fill
         priority
         sizes="(min-width: 1024px) 482px, (min-width: 768px) 656px, 100vw"
-        className="object-cover"
+        className="object-cover object-center"
       />
     </div>
   );
@@ -139,7 +139,7 @@ export function Hero({ data, className }: HeroProps) {
   const stats = data?.stats?.filter((stat) => stat?.value && stat?.label) ?? [];
 
   const imageUrl = data?.image
-    ? urlFor(data.image).width(1312).height(640).fit("crop").url()
+    ? urlFor(data.image).width(1312).auto("format").url()
     : null;
 
   return (
