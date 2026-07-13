@@ -1,7 +1,9 @@
-import { useEffect, useCallback } from "react";
-import Image from "next/image";
-import { motion, useReducedMotion, useAnimationControls } from "framer-motion";
+"use client";
 
+import Image from "next/image";
+import { motion } from "framer-motion";
+
+import { brandSliderVariants, getBrandSliderTransition } from "@/lib/motion";
 import { urlFor } from "@/lib/sanity/image";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
@@ -30,6 +32,9 @@ function BrandLogo({ brand }: { brand: BrandWithLogo }) {
     .auto("format")
     .url();
 
+  const itemClassName =
+    "flex h-24 w-[33.333vw] shrink-0 items-center justify-center md:w-[25vw] lg:w-[16.666vw]";
+
   const logo = (
     <span className="flex h-24 w-full items-center justify-center px-6 md:px-10">
       <Image
@@ -44,9 +49,6 @@ function BrandLogo({ brand }: { brand: BrandWithLogo }) {
     </span>
   );
 
-  const className =
-    "flex h-24 w-[33.333vw] shrink-0 items-center justify-center md:w-[25vw] lg:w-[16.666vw]";
-
   if (brand.url) {
     return (
       <a
@@ -54,43 +56,27 @@ function BrandLogo({ brand }: { brand: BrandWithLogo }) {
         target="_blank"
         rel="noreferrer"
         aria-label={brand.alt || "Open brand website"}
-        className={className}
+        className={itemClassName}
       >
         {logo}
       </a>
     );
   }
 
-  return <div className={className}>{logo}</div>;
+  return <div className={itemClassName}>{logo}</div>;
 }
 
 const SPEED_PER_ITEM = 4;
+const MINIMUM_DURATION = 8;
 
 export function BrandSlider({ data, className }: BrandSliderProps) {
   const brands: BrandWithLogo[] = (data?.brands ?? []).filter(hasLogo);
-  const prefersReducedMotion = useReducedMotion();
-  const controls = useAnimationControls();
-
-  const runAnimation = useCallback(() => {
-    if (prefersReducedMotion || !brands.length) return;
-    const duration = brands.length * SPEED_PER_ITEM;
-    controls.start({
-      x: "-50%",
-      transition: { repeat: Infinity, repeatType: "loop", duration, ease: "linear" },
-    });
-  }, [controls, brands.length, prefersReducedMotion]);
-
-  useEffect(() => {
-    runAnimation();
-    return () => { controls.stop(); };
-  }, [runAnimation, controls]);
-
-  const onHoverStart = useCallback(() => controls.stop(), [controls]);
-  const onHoverEnd = useCallback(() => runAnimation(), [runAnimation]);
 
   if (!brands.length) return null;
 
-  const duplicated = [...brands, ...brands];
+  const duplicatedBrands = [...brands, ...brands];
+
+  const duration = Math.max(brands.length * SPEED_PER_ITEM, MINIMUM_DURATION);
 
   return (
     <section
@@ -101,21 +87,25 @@ export function BrandSlider({ data, className }: BrandSliderProps) {
     >
       <motion.div
         className="flex w-max shrink-0 items-center"
-        animate={controls}
-        onHoverStart={prefersReducedMotion ? undefined : onHoverStart}
-        onHoverEnd={prefersReducedMotion ? undefined : onHoverEnd}
+        variants={brandSliderVariants}
+        initial="initial"
+        animate="animate"
+        transition={getBrandSliderTransition(duration)}
         style={{ willChange: "transform" }}
       >
-        {duplicated.map((brand, index) => (
+        {duplicatedBrands.map((brand, index) => (
           <BrandLogo
-            key={brand._key ?? `${brand.alt}-${index}`}
+            key={`${brand._key ?? brand.alt ?? "brand"}-${index}`}
             brand={brand}
           />
         ))}
       </motion.div>
 
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-linear-to-r from-white to-white/0 md:w-44" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-linear-to-l from-white to-white/0 md:w-44" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-linear-to-r from-white to-transparent md:w-44" />
+
+      <div className="pointer-events-noneName=pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-linear-to-r from-white to-transparent md:w-44" />
+
+      <div className="pointer-events absolute inset-y-0 right-0 z-10 w-24 bg-linear-to-l from-white to-transparent md:w-44" />
     </section>
   );
 }
