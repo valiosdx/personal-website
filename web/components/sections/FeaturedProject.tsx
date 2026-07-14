@@ -1,12 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
 import { Container } from "@/components/ui/Container";
-import { fadeIn, fadeUp, staggerContainer, viewportOnce } from "@/lib/motion";
+import { fadeIn, fadeUp, staggerContainer } from "@/lib/motion";
 import { urlFor } from "@/lib/sanity/image";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
@@ -191,6 +191,7 @@ function ProjectRow({ project }: { project: ProjectItemWithContent }) {
   const content = (
     <>
       <ProjectRowDesktop project={project} />
+
       <ProjectRowResponsive project={project} />
     </>
   );
@@ -224,6 +225,7 @@ function FeaturedProjectControls({
   onPageChange,
 }: FeaturedProjectControlsProps) {
   const isFirstPage = currentPage === 0;
+
   const isLastPage = currentPage === totalPages - 1;
 
   return (
@@ -287,7 +289,13 @@ function FeaturedProjectControls({
 
 export function FeaturedProject({ data, className }: FeaturedProjectProps) {
   const [currentPage, setCurrentPage] = useState(0);
-  const [hasEnteredView, setHasEnteredView] = useState(false);
+
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const isInView = useInView(sectionRef, {
+    once: true,
+    amount: 0.05,
+  });
 
   const projects = data?.projects?.filter(hasProjectContent) ?? [];
 
@@ -302,25 +310,28 @@ export function FeaturedProject({ data, className }: FeaturedProjectProps) {
     firstProjectIndex + PROJECTS_PER_PAGE,
   );
 
-  if (!hasFeaturedProjectContent(data)) return null;
+  if (!hasFeaturedProjectContent(data)) {
+    return null;
+  }
 
   function handlePageChange(page: number) {
-    if (page < 0 || page >= totalPages) return;
+    if (page < 0 || page >= totalPages) {
+      return;
+    }
 
     setCurrentPage(page);
   }
 
   return (
     <motion.section
+      ref={sectionRef}
       className={cn(
-        "w-full overflow-hidden bg-white py-10 md:py-14",
+        "w-full overflow-hidden bg-white py-10 md:py-14 lg:py-[60px]",
         className,
       )}
       variants={staggerContainer}
       initial="hidden"
-      whileInView="show"
-      viewport={viewportOnce}
-      onViewportEnter={() => setHasEnteredView(true)}
+      animate={isInView ? "show" : "hidden"}
     >
       <Container>
         <div className="flex w-full flex-col items-start gap-10 md:gap-14">
@@ -334,7 +345,7 @@ export function FeaturedProject({ data, className }: FeaturedProjectProps) {
               className="flex w-full flex-col items-start gap-5"
               variants={staggerContainer}
               initial="hidden"
-              animate={hasEnteredView ? "show" : "hidden"}
+              animate={isInView ? "show" : "hidden"}
               aria-live="polite"
               aria-label={`Project page ${safeCurrentPage + 1} of ${totalPages}`}
             >
