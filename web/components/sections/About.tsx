@@ -1,9 +1,18 @@
+"use client";
+
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { MdArrowOutward } from "react-icons/md";
 
 import { Container } from "@/components/ui/Container";
 import { getButtonHref } from "@/lib/button";
+import {
+  fadeUp,
+  featureImageVariants,
+  staggerContainer,
+  viewportOnce,
+} from "@/lib/motion";
 import { urlFor } from "@/lib/sanity/image";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
@@ -49,17 +58,19 @@ function AboutButton({ button }: AboutButtonProps) {
   if (!button?.label) return null;
 
   const href = getButtonHref(button);
+
   const isExternalHref =
     href.startsWith("http") ||
     href.startsWith("mailto:") ||
     href.startsWith("tel:");
 
   const className =
-    "inline-flex items-center justify-center gap-2 text-lg font-normal leading-[150%] text-[var(--color-gray-900)] font-inter transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-700 focus-visible:ring-offset-4";
+    "inline-flex items-center justify-center gap-2 font-inter text-lg font-normal leading-[150%] text-[var(--color-gray-900)] transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-700 focus-visible:ring-offset-4";
 
   const content = (
     <>
       <span>{button.label}</span>
+
       <MdArrowOutward className="h-6 w-6 text-black" aria-hidden="true" />
     </>
   );
@@ -116,6 +127,7 @@ function AboutHeadline({
       {parts.muted ? (
         <span className="text-[var(--color-gray-500)]">{parts.muted} </span>
       ) : null}
+
       <span className="text-[var(--color-gray-900)]">{parts.strong}</span>
     </p>
   );
@@ -132,7 +144,10 @@ function AboutImage({ image }: { image?: NonNullable<AboutData>["image"] }) {
     .url();
 
   return (
-    <div className="relative left-1/2 h-72 w-screen -translate-x-1/2 overflow-hidden bg-zinc-100 md:h-96">
+    <motion.div
+      className="relative left-1/2 h-72 w-screen -translate-x-1/2 overflow-hidden bg-zinc-100 md:h-96"
+      variants={featureImageVariants}
+    >
       <Image
         src={imageUrl}
         alt="About image"
@@ -140,41 +155,59 @@ function AboutImage({ image }: { image?: NonNullable<AboutData>["image"] }) {
         sizes="100vw"
         className="object-cover"
       />
-    </div>
+    </motion.div>
   );
 }
 
 function AboutDesktop({ data }: { data?: AboutData }) {
   return (
-    <div className="hidden w-full items-start justify-between gap-16 lg:flex">
-      <div className="flex w-80 shrink-0 self-stretch flex-col items-start justify-between">
+    <motion.div
+      className="hidden w-full items-start justify-between gap-16 lg:flex"
+      variants={staggerContainer}
+    >
+      <motion.div
+        className="flex w-80 shrink-0 self-stretch flex-col items-start justify-between"
+        variants={fadeUp}
+      >
         {data?.sectionLabel ? (
-          <p className="text-2xl font-medium uppercase leading-[120%] text-[var(--color-gray-700)] font-inter">
+          <p className="font-inter text-2xl font-medium uppercase leading-[120%] text-[var(--color-gray-700)]">
             {data.sectionLabel}
           </p>
         ) : null}
 
         <AboutButton button={data?.button} />
-      </div>
+      </motion.div>
 
-      <AboutHeadline headline={data?.headline} />
-    </div>
+      <motion.div className="w-full lg:max-w-[775px]" variants={fadeUp}>
+        <AboutHeadline headline={data?.headline} />
+      </motion.div>
+    </motion.div>
   );
 }
 
 function AboutResponsive({ data }: { data?: AboutData }) {
   return (
-    <div className="flex w-full flex-col items-start gap-10 md:gap-14 lg:hidden">
+    <motion.div
+      className="flex w-full flex-col items-start gap-10 md:gap-14 lg:hidden"
+      variants={staggerContainer}
+    >
       {data?.sectionLabel ? (
-        <p className="text-2xl font-medium uppercase leading-[120%] text-[var(--color-gray-700)] font-inter md:text-2xl md:leading-[120%]">
+        <motion.p
+          className="font-inter text-2xl font-medium uppercase leading-[120%] text-[var(--color-gray-700)]"
+          variants={fadeUp}
+        >
           {data.sectionLabel}
-        </p>
+        </motion.p>
       ) : null}
 
-      <AboutHeadline headline={data?.headline} />
+      <motion.div className="w-full" variants={fadeUp}>
+        <AboutHeadline headline={data?.headline} />
+      </motion.div>
 
-      <AboutButton button={data?.button} />
-    </div>
+      <motion.div variants={fadeUp}>
+        <AboutButton button={data?.button} />
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -182,15 +215,22 @@ export function About({ data, className }: AboutProps) {
   if (!hasAboutContent(data)) return null;
 
   return (
-    <section className={cn("w-full overflow-hidden bg-white", className)}>
+    <motion.section
+      className={cn("w-full overflow-hidden bg-white", className)}
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="show"
+      viewport={viewportOnce}
+    >
       <div className="py-10 md:py-14 lg:py-24">
         <Container>
           <AboutDesktop data={data} />
+
           <AboutResponsive data={data} />
         </Container>
       </div>
 
       <AboutImage image={data?.image} />
-    </section>
+    </motion.section>
   );
 }

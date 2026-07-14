@@ -1,4 +1,9 @@
+"use client";
+
+import { motion } from "framer-motion";
+
 import { Container } from "@/components/ui/Container";
+import { fadeIn, fadeUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
 
@@ -29,23 +34,29 @@ export function Contact({ data, className }: ContactProps) {
     : undefined;
 
   return (
-    <section
+    <motion.section
       className={cn("w-full bg-white py-10 md:py-14", className)}
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="show"
+      viewport={viewportOnce}
       aria-labelledby={data?.title ? "contact-title" : undefined}
     >
       <Container>
-        <div className="flex w-full flex-col gap-10">
-          {/* Heading dan description */}
-          <div
+        <motion.div
+          className="flex w-full flex-col gap-10"
+          variants={staggerContainer}
+        >
+          {/* Heading and description */}
+          <motion.div
             className={cn(
               "flex w-full flex-col items-start gap-5",
-
-              // Desktop
               "lg:flex-row lg:items-center lg:justify-between lg:gap-16",
             )}
+            variants={staggerContainer}
           >
             {data?.title ? (
-              <h2
+              <motion.h2
                 id="contact-title"
                 className={cn(
                   "w-full font-inter font-medium",
@@ -60,36 +71,40 @@ export function Contact({ data, className }: ContactProps) {
                   // Desktop
                   "lg:max-w-[777px]",
                 )}
+                variants={fadeUp}
               >
                 {data.title}
-              </h2>
+              </motion.h2>
             ) : null}
 
             {data?.description ? (
-              <p
+              <motion.p
                 className={cn(
                   "w-full font-inter text-base font-normal leading-[150%]",
                   "text-[var(--color-gray-700)]",
 
                   // Tablet
-                  "md:max-w-96 md:text-xl md:font-semibold md:leading[120%]",
+                  "md:max-w-96 md:text-xl md:font-semibold md:leading-[120%]",
 
                   // Desktop
                   "lg:max-w-96",
                 )}
+                variants={fadeUp}
               >
                 {data.description}
-              </p>
+              </motion.p>
             ) : null}
-          </div>
+          </motion.div>
 
-          <div
+          {/* Mobile and tablet divider */}
+          <motion.div
             className="h-px w-full bg-[var(--color-gray-200)] lg:hidden"
+            variants={fadeIn}
             aria-hidden="true"
           />
 
-          {/* Contact information dan social */}
-          <div
+          {/* Contact information and social */}
+          <motion.div
             className={cn(
               "flex w-full flex-col items-start gap-10",
 
@@ -99,9 +114,10 @@ export function Contact({ data, className }: ContactProps) {
               // Desktop
               "lg:items-start lg:gap-16",
             )}
+            variants={staggerContainer}
           >
-            {/* Email dan phone */}
-            <address
+            {/* Email and phone */}
+            <motion.address
               className={cn(
                 "flex w-full flex-col gap-6 not-italic",
 
@@ -111,10 +127,14 @@ export function Contact({ data, className }: ContactProps) {
                 // Desktop
                 "lg:w-full lg:max-w-[609px]",
               )}
+              variants={staggerContainer}
             >
               {/* Email */}
               {data?.email ? (
-                <div className="flex flex-col items-start gap-3">
+                <motion.div
+                  className="flex flex-col items-start gap-3"
+                  variants={fadeUp}
+                >
                   <p className="font-inter text-lg font-medium leading-7 text-[var(--color-gray-500)]">
                     {data.emailLabel || "Email"}
                   </p>
@@ -134,12 +154,15 @@ export function Contact({ data, className }: ContactProps) {
                   >
                     {data.email}
                   </a>
-                </div>
+                </motion.div>
               ) : null}
 
               {/* Phone */}
               {data?.phone && phoneHref ? (
-                <div className="flex flex-col items-start gap-3">
+                <motion.div
+                  className="flex flex-col items-start gap-3"
+                  variants={fadeUp}
+                >
                   <p className="font-inter text-lg font-medium leading-7 text-[var(--color-gray-500)]">
                     {data.phoneLabel || "Phone"}
                   </p>
@@ -159,20 +182,26 @@ export function Contact({ data, className }: ContactProps) {
                   >
                     {data.phone}
                   </a>
-                </div>
+                </motion.div>
               ) : null}
-            </address>
+            </motion.address>
 
             {/* Social */}
             {socials.length > 0 ? (
-              <div className="flex w-auto shrink-0 flex-col items-start gap-3">
+              <motion.div
+                className="flex w-auto shrink-0 flex-col items-start gap-3"
+                variants={fadeUp}
+              >
                 <p className="font-inter text-lg font-medium leading-7 text-[var(--color-gray-500)]">
                   {data?.socialLabel || "Social"}
                 </p>
 
-                <ul className="flex flex-col items-start gap-3">
+                <motion.ul
+                  className="flex flex-col items-start gap-3"
+                  variants={staggerContainer}
+                >
                   {socials.map((social) => (
-                    <li key={social._key}>
+                    <motion.li key={social._key} variants={fadeUp}>
                       {social.url ? (
                         <a
                           href={social.url}
@@ -195,14 +224,14 @@ export function Contact({ data, className }: ContactProps) {
                           {social.label}
                         </span>
                       )}
-                    </li>
+                    </motion.li>
                   ))}
-                </ul>
-              </div>
+                </motion.ul>
+              </motion.div>
             ) : null}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </Container>
-    </section>
+    </motion.section>
   );
 }

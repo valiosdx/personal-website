@@ -1,10 +1,12 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { useState, useSyncExternalStore } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
 import { Container } from "@/components/ui/Container";
+import { fadeIn, fadeUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import { urlFor } from "@/lib/sanity/image";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
@@ -24,6 +26,7 @@ type CollectionItemWithContent = CollectionItem & {
 
 function subscribeToViewport(callback: () => void) {
   const tabletQuery = window.matchMedia("(min-width: 768px)");
+
   const desktopQuery = window.matchMedia("(min-width: 1024px)");
 
   tabletQuery.addEventListener("change", callback);
@@ -31,6 +34,7 @@ function subscribeToViewport(callback: () => void) {
 
   return () => {
     tabletQuery.removeEventListener("change", callback);
+
     desktopQuery.removeEventListener("change", callback);
   };
 }
@@ -128,13 +132,14 @@ function CollectionImage({ item }: { item: CollectionItemWithContent }) {
 
 function CollectionCard({ item }: { item: CollectionItemWithContent }) {
   const content = (
-    <article
+    <motion.article
       className={cn(
         "flex h-full w-full flex-col items-start gap-5",
         "rounded-xl border border-[#DBDEE21F]/12 bg-[#4B5A50] p-5",
         "md:flex-row md:items-start",
         "lg:flex-col",
       )}
+      variants={fadeUp}
     >
       <CollectionImage item={item} />
 
@@ -151,7 +156,7 @@ function CollectionCard({ item }: { item: CollectionItemWithContent }) {
           </p>
         ) : null}
       </div>
-    </article>
+    </motion.article>
   );
 
   if (!item.url) {
@@ -178,17 +183,35 @@ function CollectionCard({ item }: { item: CollectionItemWithContent }) {
   );
 }
 
-function CollectionList({ items }: { items: CollectionItemWithContent[] }) {
+function CollectionList({
+  items,
+  currentPage,
+  itemsPerPage,
+  hasEnteredView,
+}: {
+  items: CollectionItemWithContent[];
+  currentPage: number;
+  itemsPerPage: number;
+  hasEnteredView: boolean;
+}) {
   if (!items.length) return null;
 
   return (
-    <div className="w-full" aria-live="polite">
+    <motion.div
+      key={`${itemsPerPage}-${currentPage}`}
+      className="w-full"
+      variants={staggerContainer}
+      initial="hidden"
+      animate={hasEnteredView ? "show" : "hidden"}
+      aria-live="polite"
+      aria-label={`Collection page ${currentPage + 1}`}
+    >
       <div className="flex w-full flex-col items-stretch gap-6 lg:grid lg:grid-cols-3 lg:gap-5">
         {items.map((item) => (
           <CollectionCard key={item._key} item={item} />
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -264,6 +287,9 @@ function CollectionControls({
 
 export function Collection({ data, className }: CollectionProps) {
   const [activeItemIndex, setActiveItemIndex] = useState(0);
+
+  const [hasEnteredView, setHasEnteredView] = useState(false);
+
   const itemsPerPage = useItemsPerPage();
 
   const items = data?.items?.filter(hasCollectionItemContent) ?? [];
@@ -285,33 +311,49 @@ export function Collection({ data, className }: CollectionProps) {
   if (!hasCollectionContent(data)) return null;
 
   function handlePageChange(page: number) {
-    if (page < 0 || page >= totalPages) return;
+    if (page < 0 || page >= totalPages) {
+      return;
+    }
 
     setActiveItemIndex(page * itemsPerPage);
   }
 
   return (
-    <section
+    <motion.section
       className={cn(
         "w-full overflow-hidden bg-[var(--color-primary-500)] py-10 md:py-14 lg:py-24",
         className,
       )}
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="show"
+      viewport={viewportOnce}
+      onViewportEnter={() => setHasEnteredView(true)}
     >
       <Container>
         <div className="flex w-full flex-col items-start gap-10 md:gap-14 lg:gap-24">
-          <CollectionHeader data={data} />
+          <motion.div className="w-full" variants={fadeUp}>
+            <CollectionHeader data={data} />
+          </motion.div>
 
-          <CollectionList items={visibleItems} />
+          <CollectionList
+            items={visibleItems}
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            hasEnteredView={hasEnteredView}
+          />
 
           {items.length ? (
-            <CollectionControls
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
+            <motion.div className="w-full" variants={fadeIn}>
+              <CollectionControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </motion.div>
           ) : null}
         </div>
       </Container>
-    </section>
+    </motion.section>
   );
 }
