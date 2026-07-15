@@ -1,9 +1,13 @@
+"use client";
+
+import { motion } from "framer-motion";
 import Image from "next/image";
 
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { getButtonHref } from "@/lib/button";
+import { fadeUp, featureImageVariants, staggerContainer } from "@/lib/motion";
 import { urlFor } from "@/lib/sanity/image";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
@@ -50,14 +54,14 @@ function HeroTitleBlock({ badge, title }: HeroTitleBlockProps) {
     <div className="flex w-full flex-col items-start gap-6 md:gap-10">
       {badge ? (
         <div className="hero-badge-glass w-full md:w-auto">
-          <p className="relative z-[1] flex flex-col justify-center text-sm font-medium uppercase leading-5 text-[var(--color-primary-500)] font-inter md:text-base md:leading-[22.4px]">
+          <p className="relative z-[1] flex flex-col justify-center font-inter text-sm font-medium uppercase leading-5 text-[var(--color-primary-500)] md:text-base md:leading-[22.4px]">
             {badge}
           </p>
         </div>
       ) : null}
 
       {title ? (
-        <h2 className="max-w-[632px] text-4xl font-medium uppercase leading-[50.4px] text-[var(--color-base-black)] font-inter md:text-5xl md:leading-[67.2px]">
+        <h2 className="max-w-[632px] font-inter text-4xl font-medium uppercase leading-[50.4px] text-[var(--color-base-black)] md:text-5xl md:leading-[67.2px]">
           {title}
         </h2>
       ) : null}
@@ -69,7 +73,7 @@ function HeroActionBlock({ description, button }: HeroActionBlockProps) {
   return (
     <div className="flex w-full flex-col items-start gap-10">
       {description ? (
-        <p className="w-full text-base font-normal leading-6 text-[var(--color-gray-700)] font-inter md:max-w-[482px] md:text-lg md:leading-7">
+        <p className="w-full font-inter text-base font-normal leading-6 text-[var(--color-gray-700)] md:max-w-[482px] md:text-lg md:leading-7">
           {description}
         </p>
       ) : null}
@@ -103,11 +107,11 @@ function HeroStats({ stats }: HeroStatsProps) {
             index === 0 ? "md:w-44" : "md:w-40",
           )}
         >
-          <p className="w-full text-center text-4xl font-medium leading-10 text-black font-inter md:text-left md:text-[40px] md:leading-[48px]">
+          <p className="w-full text-center font-inter text-4xl font-medium leading-10 text-black md:text-left md:text-[40px] md:leading-[48px]">
             {stat.value}
           </p>
 
-          <p className="w-full text-center text-sm font-normal leading-5 text-gray-500 font-inter md:text-left md:text-lg md:leading-7">
+          <p className="w-full text-center font-inter text-sm font-normal leading-5 text-gray-500 md:text-left md:text-lg md:leading-7">
             {stat.label}
           </p>
         </div>
@@ -145,38 +149,66 @@ export function Hero({ data, className }: HeroProps) {
   return (
     <Section className={cn("pt-14 pb-6 md:pt-28 md:pb-10 lg:pb-36", className)}>
       <Container>
-        {/* Mobile + Tablet Layout */}
-        <div className="flex flex-col gap-14 lg:hidden">
-          <div className="flex flex-col items-start gap-10">
+        {/* Mobile + Tablet */}
+        <motion.div
+          className="flex flex-col gap-14 lg:hidden"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="show"
+        >
+          <motion.div
+            className="flex flex-col items-start gap-10"
+            variants={fadeUp}
+          >
             <HeroTitleBlock badge={data?.badge} title={data?.title} />
 
             <HeroActionBlock
               description={data?.description}
               button={data?.button}
             />
-          </div>
+          </motion.div>
 
-          <HeroStats stats={stats} />
-
-          <HeroImage imageUrl={imageUrl} title={data?.title} />
-        </div>
-
-        {/* Desktop Layout */}
-        <div className="hidden lg:flex lg:items-end lg:gap-32">
-          <div className="flex w-[632px] flex-col items-start gap-72">
-            <HeroTitleBlock badge={data?.badge} title={data?.title} />
+          <motion.div className="w-full" variants={fadeUp}>
             <HeroStats stats={stats} />
-          </div>
+          </motion.div>
 
-          <div className="flex w-[482px] flex-col items-start gap-40">
+          <motion.div className="w-full" variants={featureImageVariants}>
             <HeroImage imageUrl={imageUrl} title={data?.title} />
+          </motion.div>
+        </motion.div>
 
-            <HeroActionBlock
-              description={data?.description}
-              button={data?.button}
-            />
-          </div>
-        </div>
+        {/* Desktop */}
+        <motion.div
+          className="hidden lg:flex lg:items-end lg:gap-32"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="show"
+        >
+          <motion.div
+            className="flex w-[632px] flex-col items-start gap-72"
+            variants={fadeUp}
+          >
+            <HeroTitleBlock badge={data?.badge} title={data?.title} />
+
+            <HeroStats stats={stats} />
+          </motion.div>
+
+          <motion.div
+            className="flex w-[482px] flex-col items-start gap-40"
+            variants={staggerContainer}
+          >
+            <motion.div className="w-full" variants={featureImageVariants}>
+              <HeroImage imageUrl={imageUrl} title={data?.title} />
+            </motion.div>
+
+            <motion.div className="w-full" variants={fadeUp}>
+              <HeroActionBlock
+                description={data?.description}
+                button={data?.button}
+              />
+            </motion.div>
+          </motion.div>
+        </motion.div>
       </Container>
     </Section>
   );

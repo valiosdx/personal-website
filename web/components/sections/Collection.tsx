@@ -1,7 +1,12 @@
+"use client";
+
+import { motion } from "framer-motion";
 import Image from "next/image";
+import { useState, useSyncExternalStore } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
 import { Container } from "@/components/ui/Container";
+import { fadeIn, fadeUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import { urlFor } from "@/lib/sanity/image";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
@@ -18,6 +23,45 @@ type CollectionItem = NonNullable<NonNullable<CollectionData>["items"]>[number];
 type CollectionItemWithContent = CollectionItem & {
   _key: string;
 };
+
+function subscribeToViewport(callback: () => void) {
+  const tabletQuery = window.matchMedia("(min-width: 768px)");
+
+  const desktopQuery = window.matchMedia("(min-width: 1024px)");
+
+  tabletQuery.addEventListener("change", callback);
+  desktopQuery.addEventListener("change", callback);
+
+  return () => {
+    tabletQuery.removeEventListener("change", callback);
+
+    desktopQuery.removeEventListener("change", callback);
+  };
+}
+
+function getItemsPerPage() {
+  if (window.matchMedia("(min-width: 1024px)").matches) {
+    return 3;
+  }
+
+  if (window.matchMedia("(min-width: 768px)").matches) {
+    return 2;
+  }
+
+  return 1;
+}
+
+function getServerItemsPerPage() {
+  return 1;
+}
+
+function useItemsPerPage() {
+  return useSyncExternalStore(
+    subscribeToViewport,
+    getItemsPerPage,
+    getServerItemsPerPage,
+  );
+}
 
 function hasCollectionItemContent(
   item: CollectionItem,
@@ -86,24 +130,16 @@ function CollectionImage({ item }: { item: CollectionItemWithContent }) {
   );
 }
 
-function CollectionCard({
-  item,
-  index,
-}: {
-  item: CollectionItemWithContent;
-  index: number;
-}) {
+function CollectionCard({ item }: { item: CollectionItemWithContent }) {
   const content = (
-    <article
+    <motion.article
       className={cn(
-        "h-full w-full rounded-xl border border-[#DBDEE21F]/12 bg-[#4B5A50] p-5",
-        "flex-col items-start gap-5",
+        "flex h-full w-full flex-col items-start gap-5",
+        "rounded-xl border border-[#DBDEE21F]/12 bg-[#4B5A50] p-5",
         "md:flex-row md:items-start",
         "lg:flex-col",
-        index === 0 && "flex",
-        index === 1 && "hidden md:flex",
-        index === 2 && "hidden lg:flex",
       )}
+      variants={fadeUp}
     >
       <CollectionImage item={item} />
 
@@ -120,10 +156,12 @@ function CollectionCard({
           </p>
         ) : null}
       </div>
-    </article>
+    </motion.article>
   );
 
-  if (!item.url) return content;
+  if (!item.url) {
+    return content;
+  }
 
   return (
     <a
@@ -135,9 +173,8 @@ function CollectionCard({
         "focus-visible:outline-none focus-visible:ring-2",
         "focus-visible:ring-white focus-visible:ring-offset-4",
         "focus-visible:ring-offset-neutral-700",
-        index === 1 && "hidden md:block",
-        index === 2 && "hidden lg:block",
       )}
+      aria-label={`Open ${item.title ?? "collection"}`}
     >
       <div className="h-full transition-opacity group-hover:opacity-80">
         {content}
@@ -146,66 +183,177 @@ function CollectionCard({
   );
 }
 
-function CollectionList({ items }: { items: CollectionItemWithContent[] }) {
-  const visibleItems = items.slice(0, 3);
-
-  if (!visibleItems.length) return null;
+function CollectionList({
+  items,
+  currentPage,
+  itemsPerPage,
+  hasEnteredView,
+}: {
+  items: CollectionItemWithContent[];
+  currentPage: number;
+  itemsPerPage: number;
+  hasEnteredView: boolean;
+}) {
+  if (!items.length) return null;
 
   return (
-    <div className="w-full">
+    <motion.div
+      key={`${itemsPerPage}-${currentPage}`}
+      className="w-full"
+      variants={staggerContainer}
+      initial="hidden"
+      animate={hasEnteredView ? "show" : "hidden"}
+      aria-live="polite"
+      aria-label={`Collection page ${currentPage + 1}`}
+    >
       <div className="flex w-full flex-col items-stretch gap-6 lg:grid lg:grid-cols-3 lg:gap-5">
-        {visibleItems.map((item, index) => (
-          <CollectionCard key={item._key} item={item} index={index} />
+        {items.map((item) => (
+          <CollectionCard key={item._key} item={item} />
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
-function CollectionControls() {
+type CollectionControlsProps = {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+};
+
+function CollectionControls({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: CollectionControlsProps) {
+  const isFirstPage = currentPage === 0;
+  const isLastPage = currentPage === totalPages - 1;
+
   return (
-    <div
-      className="flex w-full items-center justify-between"
-      aria-hidden="true"
-    >
-      <div className="flex items-start justify-center gap-2">
-        <span className="h-1.5 w-10 rounded-full bg-white md:h-2" />
-        <span className="h-1.5 w-1.5 rounded-full bg-white/60 md:h-2 md:w-2" />
-        <span className="h-1.5 w-1.5 rounded-full bg-white/60 md:h-2 md:w-2" />
+    <div className="flex w-full items-center justify-between">
+      <div
+        className="flex items-center justify-center gap-2"
+        aria-label="Collection pages"
+      >
+        {Array.from({ length: totalPages }, (_, page) => {
+          const isActive = page === currentPage;
+
+          return (
+            <button
+              key={page}
+              type="button"
+              onClick={() => onPageChange(page)}
+              className={cn(
+                "h-1.5 rounded-full transition-all duration-300 md:h-2",
+                isActive ? "w-10 bg-white" : "w-1.5 bg-white/60 md:w-2",
+              )}
+              aria-label={`Go to collection page ${page + 1}`}
+              aria-current={isActive ? "page" : undefined}
+            />
+          );
+        })}
       </div>
 
       <div className="flex items-start">
-        <span className="flex h-12 w-12 items-center justify-center text-white/60 md:h-14 md:w-14">
+        <button
+          type="button"
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={isFirstPage}
+          className={cn(
+            "flex h-12 w-12 cursor-pointer items-center justify-center transition-colors md:h-14 md:w-14",
+            isFirstPage ? "text-white/60" : "text-white",
+          )}
+          aria-label="Show previous collections"
+        >
           <MdArrowBack className="h-7 w-7 md:h-8 md:w-8" />
-        </span>
+        </button>
 
-        <span className="flex h-12 w-12 items-center justify-center text-white md:h-14 md:w-14">
+        <button
+          type="button"
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={isLastPage}
+          className={cn(
+            "flex h-12 w-12 cursor-pointer items-center justify-center transition-colors md:h-14 md:w-14",
+            isLastPage ? "text-white/60" : "text-white",
+          )}
+          aria-label="Show next collections"
+        >
           <MdArrowForward className="h-7 w-7 md:h-8 md:w-8" />
-        </span>
+        </button>
       </div>
     </div>
   );
 }
 
 export function Collection({ data, className }: CollectionProps) {
-  if (!hasCollectionContent(data)) return null;
+  const [activeItemIndex, setActiveItemIndex] = useState(0);
+
+  const [hasEnteredView, setHasEnteredView] = useState(false);
+
+  const itemsPerPage = useItemsPerPage();
 
   const items = data?.items?.filter(hasCollectionItemContent) ?? [];
 
+  const totalPages = Math.ceil(items.length / itemsPerPage);
+
+  const currentPage = Math.min(
+    Math.floor(activeItemIndex / itemsPerPage),
+    Math.max(totalPages - 1, 0),
+  );
+
+  const firstItemIndex = currentPage * itemsPerPage;
+
+  const visibleItems = items.slice(
+    firstItemIndex,
+    firstItemIndex + itemsPerPage,
+  );
+
+  if (!hasCollectionContent(data)) return null;
+
+  function handlePageChange(page: number) {
+    if (page < 0 || page >= totalPages) {
+      return;
+    }
+
+    setActiveItemIndex(page * itemsPerPage);
+  }
+
   return (
-    <section
+    <motion.section
       className={cn(
         "w-full overflow-hidden bg-[var(--color-primary-500)] py-10 md:py-14 lg:py-24",
         className,
       )}
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="show"
+      viewport={viewportOnce}
+      onViewportEnter={() => setHasEnteredView(true)}
     >
       <Container>
         <div className="flex w-full flex-col items-start gap-10 md:gap-14 lg:gap-24">
-          <CollectionHeader data={data} />
-          <CollectionList items={items} />
-          {items.length ? <CollectionControls /> : null}
+          <motion.div className="w-full" variants={fadeUp}>
+            <CollectionHeader data={data} />
+          </motion.div>
+
+          <CollectionList
+            items={visibleItems}
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            hasEnteredView={hasEnteredView}
+          />
+
+          {items.length ? (
+            <motion.div className="w-full" variants={fadeIn}>
+              <CollectionControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </motion.div>
+          ) : null}
         </div>
       </Container>
-    </section>
+    </motion.section>
   );
 }

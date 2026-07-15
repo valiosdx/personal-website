@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Inter_Tight } from "next/font/google";
 
+import { SmoothScroll } from "@/components/providers/SmoothScroll";
+
+import "lenis/dist/lenis.css";
 import "../styles/globals.css";
 
 const inter = Inter({
@@ -26,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${interTight.variable}`}>
-        {children}
+        <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>
   );

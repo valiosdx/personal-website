@@ -1,4 +1,9 @@
+"use client";
+
+import { motion } from "framer-motion";
+
 import { Container } from "@/components/ui/Container";
+import { fadeIn, fadeUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
 
@@ -30,21 +35,42 @@ function splitCopyrightText(value?: string) {
 }
 
 export function Footer({ data, className }: FooterProps) {
-  if (!data?.leftText && !data?.rightText) return null;
+  if (!data?.leftText && !data?.rightText) {
+    return null;
+  }
 
   const copyright = splitCopyrightText(data.leftText);
 
   return (
-    <footer className={cn("w-full bg-white pt-14 pb-14", className)}>
+    <motion.footer
+      className={cn("w-full bg-white pt-14 pb-14", className)}
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="show"
+      viewport={viewportOnce}
+    >
       <Container>
-        <div className="flex w-full flex-col gap-6">
+        <motion.div
+          className="flex w-full flex-col gap-6"
+          variants={staggerContainer}
+        >
           {/* Divider */}
-          <div className="h-px w-full bg-[var(--color-gray-200)]" />
+          <motion.div
+            className="h-px w-full bg-[var(--color-gray-200)]"
+            variants={fadeIn}
+            aria-hidden="true"
+          />
 
           {/* Footer content */}
-          <div className="flex w-full flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <motion.div
+            className="flex w-full flex-col gap-3 md:flex-row md:items-center md:justify-between"
+            variants={staggerContainer}
+          >
             {copyright ? (
-              <p className="font-inter text-base font-medium leading-7 md:text-lg">
+              <motion.p
+                className="font-inter text-base font-medium leading-7 md:text-lg"
+                variants={fadeUp}
+              >
                 <span className="text-[var(--color-gray-900)]">
                   {copyright.primary}
                 </span>
@@ -57,17 +83,20 @@ export function Footer({ data, className }: FooterProps) {
                     </span>
                   </>
                 ) : null}
-              </p>
+              </motion.p>
             ) : null}
 
             {data?.rightText ? (
-              <p className="font-inter text-base font-medium leading-7 text-[var(--color-gray-500)] md:text-lg">
+              <motion.p
+                className="font-inter text-base font-medium leading-7 text-[var(--color-gray-500)] md:text-lg"
+                variants={fadeUp}
+              >
                 {data.rightText}
-              </p>
+              </motion.p>
             ) : null}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </Container>
-    </footer>
+    </motion.footer>
   );
 }

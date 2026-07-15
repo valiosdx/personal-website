@@ -13,7 +13,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth; */
 }
 
 body {
@@ -83,4 +83,3 @@ body {
   filter: grayscale(1) brightness(0);
   opacity: 24%;
 }
-
