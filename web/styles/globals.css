@@ -5,6 +5,8 @@
 :root {
   --background: #ffffff;
   --foreground: #111827;
+  --motion-duration-interaction: 400ms;
+  --motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @theme inline {
@@ -20,6 +22,11 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter);
+}
+
+.interaction-transition {
+  transition-duration: var(--motion-duration-interaction);
+  transition-timing-function: var(--motion-ease-standard);
 }
 
 .hero-badge-glass {
