@@ -1,4 +1,9 @@
+"use client";
+
+import { motion } from "framer-motion";
+
 import { Container } from "@/components/ui/Container";
+import { fadeUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
 
@@ -34,29 +39,44 @@ function hasServiceContent(data?: ServiceData) {
 
 function ServiceHeader({ data }: { data?: ServiceData }) {
   return (
-    <div className="flex w-full flex-col items-start gap-6 lg:flex-row lg:gap-24">
+    <motion.div
+      className="flex w-full flex-col items-start gap-6 lg:flex-row lg:gap-24"
+      variants={staggerContainer}
+    >
       {data?.sectionLabel ? (
-        <div className="flex w-full items-center gap-3 lg:w-auto lg:py-3">
-          <p className="font-inter uppercase text-xl font-medium leading-[120%] text-[var(--color-gray-700)] md:text-2xl">
+        <motion.div
+          className="flex w-full items-center gap-3 lg:w-auto lg:py-3"
+          variants={fadeUp}
+        >
+          <p className="font-inter text-xl font-medium uppercase leading-[120%] text-[var(--color-gray-700)] md:text-2xl">
             {data.sectionLabel}
           </p>
-        </div>
+        </motion.div>
       ) : null}
 
-      <div className="flex w-full flex-col items-start gap-5 lg:flex-1">
+      <motion.div
+        className="flex w-full flex-col items-start gap-5 lg:flex-1"
+        variants={staggerContainer}
+      >
         {data?.title ? (
-          <h2 className="font-inter w-full text-[32px] font-normal leading-[140%] text-black md:text-[44px] md:leading-[140%] lg:max-w-[571px]">
+          <motion.h2
+            className="font-inter w-full text-[32px] font-normal leading-[140%] text-black md:text-[44px] md:leading-[140%] lg:max-w-[571px]"
+            variants={fadeUp}
+          >
             {data.title}
-          </h2>
+          </motion.h2>
         ) : null}
 
         {data?.description ? (
-          <p className="font-inter w-full text-base font-normal leading-[150%] text-[var(--color-gray-700)] md:max-w-[451px] md:text-lg">
+          <motion.p
+            className="font-inter w-full text-base font-normal leading-[150%] text-[var(--color-gray-700)] md:max-w-[451px] md:text-lg"
+            variants={fadeUp}
+          >
             {data.description}
-          </p>
+          </motion.p>
         ) : null}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -68,7 +88,10 @@ function ServiceCard({
   isFirst?: boolean;
 }) {
   return (
-    <article className="flex w-full flex-col items-start gap-5">
+    <motion.article
+      className="flex w-full flex-col items-start gap-5"
+      variants={fadeUp}
+    >
       <div className="flex flex-col items-start gap-6">
         {service.number ? (
           <p
@@ -88,14 +111,14 @@ function ServiceCard({
         ) : null}
       </div>
 
-      <div className="h-px w-full bg-gray-200" />
+      <div className="h-px w-full bg-gray-200" aria-hidden="true" />
 
       {service.description ? (
         <p className="font-inter w-full text-base font-normal leading-[150%] text-[var(--color-gray-900)] md:text-xl md:leading-[120%]">
           {service.description}
         </p>
       ) : null}
-    </article>
+    </motion.article>
   );
 }
 
@@ -103,7 +126,10 @@ function ServiceList({ services }: { services: ServiceItemWithContent[] }) {
   if (!services.length) return null;
 
   return (
-    <div className="flex w-full flex-col items-start gap-10 md:gap-14 lg:grid lg:grid-cols-[384px_384px] lg:gap-x-24 lg:gap-y-14 lg:pl-48">
+    <motion.div
+      className="flex w-full flex-col items-start gap-10 md:gap-14 lg:grid lg:grid-cols-[384px_384px] lg:gap-x-24 lg:gap-y-14 lg:pl-48"
+      variants={staggerContainer}
+    >
       {services.map((service, index) => (
         <ServiceCard
           key={service._key}
@@ -111,7 +137,7 @@ function ServiceList({ services }: { services: ServiceItemWithContent[] }) {
           isFirst={index === 0}
         />
       ))}
-    </div>
+    </motion.div>
   );
 }
 
@@ -121,18 +147,23 @@ export function Service({ data, className }: ServiceProps) {
   const services = data?.services?.filter(hasServiceItemContent) ?? [];
 
   return (
-    <section
+    <motion.section
       className={cn(
         "w-full overflow-hidden bg-white px-0 pt-10 pb-14 md:pt-14 md:pb-20 lg:py-24",
         className,
       )}
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="show"
+      viewport={viewportOnce}
     >
       <Container>
         <div className="flex w-full flex-col items-center gap-14 md:gap-24">
           <ServiceHeader data={data} />
+
           <ServiceList services={services} />
         </div>
       </Container>
-    </section>
+    </motion.section>
   );
 }

@@ -1,10 +1,12 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
 import { Container } from "@/components/ui/Container";
+import { fadeIn, fadeUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import { urlFor } from "@/lib/sanity/image";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
@@ -193,7 +195,9 @@ function ProjectRow({ project }: { project: ProjectItemWithContent }) {
     </>
   );
 
-  if (!project.url) return content;
+  if (!project.url) {
+    return content;
+  }
 
   return (
     <a
@@ -283,6 +287,7 @@ function FeaturedProjectControls({
 
 export function FeaturedProject({ data, className }: FeaturedProjectProps) {
   const [currentPage, setCurrentPage] = useState(0);
+  const [hasEnteredView, setHasEnteredView] = useState(false);
 
   const projects = data?.projects?.filter(hasProjectContent) ?? [];
 
@@ -306,37 +311,56 @@ export function FeaturedProject({ data, className }: FeaturedProjectProps) {
   }
 
   return (
-    <section
+    <motion.section
       className={cn(
         "w-full overflow-hidden bg-white py-10 md:py-14",
         className,
       )}
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="show"
+      viewport={viewportOnce}
+      onViewportEnter={() => setHasEnteredView(true)}
     >
       <Container>
         <div className="flex w-full flex-col items-start gap-10 md:gap-14">
-          <FeaturedProjectHeader data={data} />
+          <motion.div className="w-full" variants={fadeUp}>
+            <FeaturedProjectHeader data={data} />
+          </motion.div>
 
           {visibleProjects.length ? (
-            <div
+            <motion.div
+              key={safeCurrentPage}
               className="flex w-full flex-col items-start gap-5"
+              variants={staggerContainer}
+              initial="hidden"
+              animate={hasEnteredView ? "show" : "hidden"}
               aria-live="polite"
               aria-label={`Project page ${safeCurrentPage + 1} of ${totalPages}`}
             >
               {visibleProjects.map((project) => (
-                <ProjectRow key={project._key} project={project} />
+                <motion.div
+                  key={project._key}
+                  className="w-full"
+                  variants={fadeUp}
+                >
+                  <ProjectRow project={project} />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           ) : null}
 
           {totalPages > 0 ? (
-            <FeaturedProjectControls
-              currentPage={safeCurrentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
+            <motion.div className="w-full" variants={fadeIn}>
+              <FeaturedProjectControls
+                currentPage={safeCurrentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </motion.div>
           ) : null}
         </div>
       </Container>
-    </section>
+    </motion.section>
   );
 }
