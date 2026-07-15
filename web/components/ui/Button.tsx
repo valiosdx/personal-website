@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type {
-  ButtonHTMLAttributes,
   AnchorHTMLAttributes,
+  ButtonHTMLAttributes,
   ReactNode,
 } from "react";
 
@@ -30,12 +30,83 @@ type ButtonAsButtonProps = BaseButtonProps &
 type ButtonProps = ButtonAsLinkProps | ButtonAsButtonProps;
 
 const buttonSizes: Record<ButtonSize, string> = {
-  sm: "px-4 py-[9px] text-sm font-normal font-tight text-white leading-[150%]",
-  md: "px-6 py-3 text-lg font-medium font-inter text-white leading-7",
+  sm: cn(
+    "px-4 py-[9px]",
+    "font-tight text-sm font-normal",
+    "leading-[150%] text-white",
+  ),
+  md: cn("px-6 py-3", "font-inter text-lg font-medium", "leading-7 text-white"),
 };
 
-const buttonBaseClass =
-  "inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-lg bg-[var(--color-primary-500)] font-[var(--font-sans)]";
+const buttonContentSizes: Record<ButtonSize, string> = {
+  sm: "h-[21px]",
+  md: "h-7",
+};
+
+const buttonBaseClass = cn(
+  "group inline-flex shrink-0",
+  "items-center justify-center overflow-hidden",
+  "whitespace-nowrap rounded-lg",
+  "bg-[var(--color-primary-500)]",
+  "font-[var(--font-inter)]",
+
+  // Background transition
+  "transition-colors duration-400 ease-out",
+  "delay-0 hover:delay-75",
+
+  // Background interaction
+  "hover:bg-[var(--color-primary-400)]",
+  "active:bg-[var(--color-primary-400)]",
+
+  // Keyboard focus
+  "focus-visible:outline-none",
+  "focus-visible:ring-2",
+  "focus-visible:ring-[var(--color-primary-500)]",
+  "focus-visible:ring-offset-4",
+
+  // Disabled
+  "disabled:pointer-events-none",
+  "disabled:cursor-not-allowed",
+  "disabled:opacity-50",
+);
+
+function ButtonContent({
+  children,
+  size,
+}: {
+  children: ReactNode;
+  size: ButtonSize;
+}) {
+  return (
+    <span
+      className={cn("relative block overflow-hidden", buttonContentSizes[size])}
+    >
+      <span
+        className={cn(
+          "block",
+          "transition-transform duration-400 ease-out",
+          "delay-0 group-hover:delay-75",
+          "group-hover:-translate-y-full",
+        )}
+      >
+        {children}
+      </span>
+
+      <span
+        className={cn(
+          "absolute left-0 top-0 block",
+          "translate-y-full",
+          "transition-transform duration-400 ease-out",
+          "delay-0 group-hover:delay-75",
+          "group-hover:translate-y-0",
+        )}
+        aria-hidden="true"
+      >
+        {children}
+      </span>
+    </span>
+  );
+}
 
 export function Button(props: ButtonProps) {
   const {
@@ -49,41 +120,56 @@ export function Button(props: ButtonProps) {
 
   const buttonClassName = cn(buttonBaseClass, buttonSizes[size], className);
 
+  const content = <ButtonContent size={size}>{children}</ButtonContent>;
+
   if (href) {
-    const isExternalUrl = href.startsWith("http");
+    const anchorProps = restProps as AnchorHTMLAttributes<HTMLAnchorElement>;
+
+    const target = openInNewTab ? "_blank" : anchorProps.target;
+
+    const rel = openInNewTab ? "noopener noreferrer" : anchorProps.rel;
+
+    const isExternalUrl =
+      href.startsWith("http") ||
+      href.startsWith("mailto:") ||
+      href.startsWith("tel:");
 
     if (isExternalUrl) {
       return (
         <a
+          {...anchorProps}
           href={href}
           className={buttonClassName}
-          target={openInNewTab ? "_blank" : undefined}
-          rel={openInNewTab ? "noreferrer" : undefined}
+          target={target}
+          rel={rel}
         >
-          {children}
+          {content}
         </a>
       );
     }
 
     return (
       <Link
+        {...anchorProps}
         href={href}
         className={buttonClassName}
-        target={openInNewTab ? "_blank" : undefined}
-        rel={openInNewTab ? "noreferrer" : undefined}
-        {...(restProps as AnchorHTMLAttributes<HTMLAnchorElement>)}
+        target={target}
+        rel={rel}
       >
-        {children}
+        {content}
       </Link>
     );
   }
 
+  const buttonProps = restProps as ButtonHTMLAttributes<HTMLButtonElement>;
+
   return (
     <button
+      {...buttonProps}
+      type={buttonProps.type ?? "button"}
       className={buttonClassName}
-      {...(restProps as ButtonHTMLAttributes<HTMLButtonElement>)}
     >
-      {children}
+      {content}
     </button>
   );
 }

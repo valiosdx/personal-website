@@ -55,7 +55,9 @@ function getHeadlineParts(headline?: string) {
 }
 
 function AboutButton({ button }: AboutButtonProps) {
-  if (!button?.label) return null;
+  if (!button?.label) {
+    return null;
+  }
 
   const href = getButtonHref(button);
 
@@ -64,31 +66,89 @@ function AboutButton({ button }: AboutButtonProps) {
     href.startsWith("mailto:") ||
     href.startsWith("tel:");
 
-  const className =
-    "inline-flex items-center justify-center gap-2 font-inter text-lg font-normal leading-[150%] text-[var(--color-gray-900)] transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-700 focus-visible:ring-offset-4";
+  const isExternalWebUrl = href.startsWith("http");
+
+  const target = button.openInNewTab && isExternalWebUrl ? "_blank" : undefined;
+
+  const rel =
+    button.openInNewTab && isExternalWebUrl ? "noopener noreferrer" : undefined;
+
+  const className = cn(
+    "group inline-flex items-center",
+    "justify-center py-2",
+    "font-inter text-lg font-normal",
+    "leading-7 text-[var(--color-gray-900)]",
+
+    // Keyboard focus
+    "focus-visible:outline-none",
+    "focus-visible:ring-2",
+    "focus-visible:ring-gray-700",
+    "focus-visible:ring-offset-4",
+  );
 
   const content = (
-    <>
-      <span>{button.label}</span>
+    <span className="flex items-center gap-2">
+      <span className="relative block h-7 overflow-hidden leading-7">
+        <span
+          className={cn(
+            "block",
+            "transition-transform",
+            "duration-400 ease-out",
+            "delay-0 group-hover:delay-75",
+            "group-hover:translate-y-full",
+          )}
+        >
+          {button.label}
+        </span>
 
-      <MdArrowOutward className="h-6 w-6 text-black" aria-hidden="true" />
-    </>
+        <span
+          className={cn(
+            "absolute left-0 top-0 block",
+            "-translate-y-full",
+            "transition-transform",
+            "duration-400 ease-out",
+            "delay-0 group-hover:delay-75",
+            "group-hover:translate-y-0",
+          )}
+          aria-hidden="true"
+        >
+          {button.label}
+        </span>
+      </span>
+
+      <span
+        className="relative block h-6 w-6 overflow-hidden"
+        aria-hidden="true"
+      >
+        <MdArrowOutward
+          className={cn(
+            "absolute inset-0 h-6 w-6",
+            "transition-transform",
+            "duration-400 ease-out",
+            "delay-0 group-hover:delay-75",
+            "group-hover:translate-x-full",
+            "group-hover:-translate-y-full",
+          )}
+        />
+
+        <MdArrowOutward
+          className={cn(
+            "absolute inset-0 h-6 w-6",
+            "-translate-x-full translate-y-full",
+            "transition-transform",
+            "duration-400 ease-out",
+            "delay-0 group-hover:delay-75",
+            "group-hover:translate-x-0",
+            "group-hover:translate-y-0",
+          )}
+        />
+      </span>
+    </span>
   );
 
   if (isExternalHref) {
     return (
-      <a
-        href={href}
-        target={
-          button.openInNewTab && href.startsWith("http") ? "_blank" : undefined
-        }
-        rel={
-          button.openInNewTab && href.startsWith("http")
-            ? "noreferrer"
-            : undefined
-        }
-        className={className}
-      >
+      <a href={href} target={target} rel={rel} className={className}>
         {content}
       </a>
     );
@@ -98,7 +158,7 @@ function AboutButton({ button }: AboutButtonProps) {
     <Link
       href={href}
       target={button.openInNewTab ? "_blank" : undefined}
-      rel={button.openInNewTab ? "noreferrer" : undefined}
+      rel={button.openInNewTab ? "noopener noreferrer" : undefined}
       className={className}
     >
       {content}
