@@ -6,7 +6,13 @@ import { useState, useSyncExternalStore } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
 import { Container } from "@/components/ui/Container";
-import { fadeIn, fadeUp, staggerContainer, viewportOnce } from "@/lib/motion";
+import {
+  carouselTransition,
+  fadeIn,
+  fadeUp,
+  staggerContainer,
+  viewportOnce,
+} from "@/lib/motion";
 import { urlFor } from "@/lib/sanity/image";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
@@ -132,14 +138,13 @@ function CollectionImage({ item }: { item: CollectionItemWithContent }) {
 
 function CollectionCard({ item }: { item: CollectionItemWithContent }) {
   const content = (
-    <motion.article
+    <article
       className={cn(
         "flex h-full w-full flex-col items-start gap-5",
         "rounded-xl border border-[#DBDEE21F]/12 bg-[#4B5A50] p-5",
         "md:flex-row md:items-start",
         "lg:flex-col",
       )}
-      variants={fadeUp}
     >
       <CollectionImage item={item} />
 
@@ -156,7 +161,7 @@ function CollectionCard({ item }: { item: CollectionItemWithContent }) {
           </p>
         ) : null}
       </div>
-    </motion.article>
+    </article>
   );
 
   if (!item.url) {
@@ -176,41 +181,65 @@ function CollectionCard({ item }: { item: CollectionItemWithContent }) {
       )}
       aria-label={`Open ${item.title ?? "collection"}`}
     >
-      <div className="h-full transition-opacity group-hover:opacity-80">
+      <div className="interaction-transition h-full transition-opacity group-hover:opacity-80">
         {content}
       </div>
     </a>
   );
 }
 
-function CollectionList({
+function CollectionCarousel({
   items,
   currentPage,
   itemsPerPage,
-  hasEnteredView,
 }: {
   items: CollectionItemWithContent[];
   currentPage: number;
   itemsPerPage: number;
-  hasEnteredView: boolean;
 }) {
   if (!items.length) return null;
 
+  const pages = Array.from(
+    { length: Math.ceil(items.length / itemsPerPage) },
+    (_, page) => {
+      const firstItemIndex = page * itemsPerPage;
+
+      return items.slice(firstItemIndex, firstItemIndex + itemsPerPage);
+    },
+  );
+
   return (
     <motion.div
-      key={`${itemsPerPage}-${currentPage}`}
-      className="w-full"
-      variants={staggerContainer}
-      initial="hidden"
-      animate={hasEnteredView ? "show" : "hidden"}
+      className="w-full overflow-hidden"
+      variants={fadeIn}
       aria-live="polite"
       aria-label={`Collection page ${currentPage + 1}`}
     >
-      <div className="flex w-full flex-col items-stretch gap-6 lg:grid lg:grid-cols-3 lg:gap-5">
-        {items.map((item) => (
-          <CollectionCard key={item._key} item={item} />
-        ))}
-      </div>
+      <motion.div
+        className="-ml-6 flex items-stretch"
+        initial={false}
+        animate={{ x: `-${currentPage * 100}%` }}
+        transition={carouselTransition}
+      >
+        {pages.map((pageItems, page) => {
+          const isActivePage = page === currentPage;
+
+          return (
+            <div
+              key={pageItems.map((item) => item._key).join("-")}
+              className="min-w-0 shrink-0 basis-full pl-6"
+              aria-hidden={!isActivePage}
+              inert={!isActivePage}
+            >
+              <div className="flex w-full flex-col items-stretch gap-6 lg:grid lg:grid-cols-3 lg:gap-5">
+                {pageItems.map((item) => (
+                  <CollectionCard key={item._key} item={item} />
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </motion.div>
     </motion.div>
   );
 }
@@ -244,7 +273,7 @@ function CollectionControls({
               type="button"
               onClick={() => onPageChange(page)}
               className={cn(
-                "h-1.5 rounded-full transition-all duration-300 md:h-2",
+                "interaction-transition h-1.5 rounded-full transition-all md:h-2",
                 isActive ? "w-10 bg-white" : "w-1.5 bg-white/60 md:w-2",
               )}
               aria-label={`Go to collection page ${page + 1}`}
@@ -260,7 +289,7 @@ function CollectionControls({
           onClick={() => onPageChange(currentPage - 1)}
           disabled={isFirstPage}
           className={cn(
-            "flex h-12 w-12 cursor-pointer items-center justify-center transition-colors md:h-14 md:w-14",
+            "interaction-transition flex h-12 w-12 cursor-pointer items-center justify-center transition-colors md:h-14 md:w-14",
             isFirstPage ? "text-white/60" : "text-white",
           )}
           aria-label="Show previous collections"
@@ -273,7 +302,7 @@ function CollectionControls({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={isLastPage}
           className={cn(
-            "flex h-12 w-12 cursor-pointer items-center justify-center transition-colors md:h-14 md:w-14",
+            "interaction-transition flex h-12 w-12 cursor-pointer items-center justify-center transition-colors md:h-14 md:w-14",
             isLastPage ? "text-white/60" : "text-white",
           )}
           aria-label="Show next collections"
@@ -288,8 +317,6 @@ function CollectionControls({
 export function Collection({ data, className }: CollectionProps) {
   const [activeItemIndex, setActiveItemIndex] = useState(0);
 
-  const [hasEnteredView, setHasEnteredView] = useState(false);
-
   const itemsPerPage = useItemsPerPage();
 
   const items = data?.items?.filter(hasCollectionItemContent) ?? [];
@@ -299,13 +326,6 @@ export function Collection({ data, className }: CollectionProps) {
   const currentPage = Math.min(
     Math.floor(activeItemIndex / itemsPerPage),
     Math.max(totalPages - 1, 0),
-  );
-
-  const firstItemIndex = currentPage * itemsPerPage;
-
-  const visibleItems = items.slice(
-    firstItemIndex,
-    firstItemIndex + itemsPerPage,
   );
 
   if (!hasCollectionContent(data)) return null;
@@ -328,7 +348,6 @@ export function Collection({ data, className }: CollectionProps) {
       initial="hidden"
       whileInView="show"
       viewport={viewportOnce}
-      onViewportEnter={() => setHasEnteredView(true)}
     >
       <Container>
         <div className="flex w-full flex-col items-start gap-10 md:gap-14 lg:gap-24">
@@ -336,11 +355,10 @@ export function Collection({ data, className }: CollectionProps) {
             <CollectionHeader data={data} />
           </motion.div>
 
-          <CollectionList
-            items={visibleItems}
+          <CollectionCarousel
+            items={items}
             currentPage={currentPage}
             itemsPerPage={itemsPerPage}
-            hasEnteredView={hasEnteredView}
           />
 
           {items.length ? (
