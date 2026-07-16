@@ -28,6 +28,85 @@ export const carouselTransition: Transition = {
   ease: motionEasings.standard,
 };
 
+const interactionTransition: Transition = {
+  duration: motionDurations.interaction,
+  ease: motionEasings.standard,
+};
+
+export const buttonVariants: Variants = {
+  rest: {
+    scale: 1,
+    backgroundColor: "var(--color-primary-500)",
+  },
+  hover: {
+    backgroundColor: "var(--color-primary-400)",
+    transition: interactionTransition,
+  },
+  tap: {
+    scale: 0.98,
+    transition: interactionTransition,
+  },
+};
+
+export const buttonTextPrimaryVariants: Variants = {
+  rest: { y: "0%" },
+  hover: {
+    y: "-100%",
+    transition: interactionTransition,
+  },
+};
+
+export const buttonTextSecondaryVariants: Variants = {
+  rest: { y: "100%" },
+  hover: {
+    y: "0%",
+    transition: interactionTransition,
+  },
+};
+
+export const aboutButtonVariants: Variants = {
+  rest: { scale: 1 },
+  hover: { scale: 1 },
+  tap: {
+    scale: 0.98,
+    transition: interactionTransition,
+  },
+};
+
+export const aboutButtonTextPrimaryVariants: Variants = {
+  rest: { y: "0%" },
+  hover: {
+    y: "100%",
+    transition: interactionTransition,
+  },
+};
+
+export const aboutButtonTextSecondaryVariants: Variants = {
+  rest: { y: "-100%" },
+  hover: {
+    y: "0%",
+    transition: interactionTransition,
+  },
+};
+
+export const aboutButtonIconPrimaryVariants: Variants = {
+  rest: { x: "0%", y: "0%" },
+  hover: {
+    x: "100%",
+    y: "-100%",
+    transition: interactionTransition,
+  },
+};
+
+export const aboutButtonIconSecondaryVariants: Variants = {
+  rest: { x: "-100%", y: "100%" },
+  hover: {
+    x: "0%",
+    y: "0%",
+    transition: interactionTransition,
+  },
+};
+
 export const viewportOnce = {
   once: true,
   amount: 0.2,

@@ -1,11 +1,15 @@
+"use client";
+
+import { motion, type HTMLMotionProps } from "framer-motion";
 import Link from "next/link";
-import type {
-  AnchorHTMLAttributes,
-  ButtonHTMLAttributes,
-  ReactNode,
-} from "react";
+import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
+import {
+  buttonTextPrimaryVariants,
+  buttonTextSecondaryVariants,
+  buttonVariants,
+} from "@/lib/motion";
 
 type ButtonSize = "sm" | "md";
 
@@ -16,13 +20,13 @@ type BaseButtonProps = {
 };
 
 type ButtonAsLinkProps = BaseButtonProps &
-  AnchorHTMLAttributes<HTMLAnchorElement> & {
+  Omit<HTMLMotionProps<"a">, "children" | "href"> & {
     href: string;
     openInNewTab?: boolean;
   };
 
 type ButtonAsButtonProps = BaseButtonProps &
-  ButtonHTMLAttributes<HTMLButtonElement> & {
+  Omit<HTMLMotionProps<"button">, "children"> & {
     href?: never;
     openInNewTab?: never;
   };
@@ -44,19 +48,11 @@ const buttonContentSizes: Record<ButtonSize, string> = {
 };
 
 const buttonBaseClass = cn(
-  "group inline-flex shrink-0",
+  "inline-flex shrink-0",
   "items-center justify-center overflow-hidden",
   "whitespace-nowrap rounded-lg",
   "bg-[var(--color-primary-500)]",
   "font-[var(--font-inter)]",
-
-  // Background transition
-  "transition-colors duration-400 ease-out",
-  "delay-0 hover:delay-75",
-
-  // Background interaction
-  "hover:bg-[var(--color-primary-400)]",
-  "active:bg-[var(--color-primary-400)]",
 
   // Keyboard focus
   "focus-visible:outline-none",
@@ -81,29 +77,20 @@ function ButtonContent({
     <span
       className={cn("relative block overflow-hidden", buttonContentSizes[size])}
     >
-      <span
-        className={cn(
-          "block",
-          "transition-transform duration-400 ease-out",
-          "delay-0 group-hover:delay-75",
-          "group-hover:-translate-y-full",
-        )}
+      <motion.span
+        className="block"
+        variants={buttonTextPrimaryVariants}
       >
         {children}
-      </span>
+      </motion.span>
 
-      <span
-        className={cn(
-          "absolute left-0 top-0 block",
-          "translate-y-full",
-          "transition-transform duration-400 ease-out",
-          "delay-0 group-hover:delay-75",
-          "group-hover:translate-y-0",
-        )}
+      <motion.span
+        className="absolute left-0 top-0 block"
+        variants={buttonTextSecondaryVariants}
         aria-hidden="true"
       >
         {children}
-      </span>
+      </motion.span>
     </span>
   );
 }
@@ -123,7 +110,7 @@ export function Button(props: ButtonProps) {
   const content = <ButtonContent size={size}>{children}</ButtonContent>;
 
   if (href) {
-    const anchorProps = restProps as AnchorHTMLAttributes<HTMLAnchorElement>;
+    const anchorProps = restProps as HTMLMotionProps<"a">;
 
     const target = openInNewTab ? "_blank" : anchorProps.target;
 
@@ -136,40 +123,59 @@ export function Button(props: ButtonProps) {
 
     if (isExternalUrl) {
       return (
-        <a
+        <motion.a
           {...anchorProps}
           href={href}
           className={buttonClassName}
           target={target}
           rel={rel}
+          variants={buttonVariants}
+          initial="rest"
+          animate="rest"
+          whileHover="hover"
+          whileFocus="hover"
+          whileTap="tap"
         >
           {content}
-        </a>
+        </motion.a>
       );
     }
 
     return (
-      <Link
-        {...anchorProps}
-        href={href}
-        className={buttonClassName}
-        target={target}
-        rel={rel}
-      >
-        {content}
+      <Link href={href} legacyBehavior passHref>
+        <motion.a
+          {...anchorProps}
+          className={buttonClassName}
+          target={target}
+          rel={rel}
+          variants={buttonVariants}
+          initial="rest"
+          animate="rest"
+          whileHover="hover"
+          whileFocus="hover"
+          whileTap="tap"
+        >
+          {content}
+        </motion.a>
       </Link>
     );
   }
 
-  const buttonProps = restProps as ButtonHTMLAttributes<HTMLButtonElement>;
+  const buttonProps = restProps as HTMLMotionProps<"button">;
 
   return (
-    <button
+    <motion.button
       {...buttonProps}
       type={buttonProps.type ?? "button"}
       className={buttonClassName}
+      variants={buttonVariants}
+      initial="rest"
+      animate="rest"
+      whileHover={buttonProps.disabled ? undefined : "hover"}
+      whileFocus={buttonProps.disabled ? undefined : "hover"}
+      whileTap={buttonProps.disabled ? undefined : "tap"}
     >
       {content}
-    </button>
+    </motion.button>
   );
 }
