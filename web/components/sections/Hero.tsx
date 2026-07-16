@@ -11,6 +11,7 @@ import { fadeUp, featureImageVariants, staggerContainer } from "@/lib/motion";
 import { urlFor } from "@/lib/sanity/image";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 
 type HeroData = Homepage["hero"];
 
@@ -95,7 +96,9 @@ function HeroActionBlock({ description, button }: HeroActionBlockProps) {
 }
 
 function HeroStats({ stats }: HeroStatsProps) {
-  if (!stats.length) return null;
+  if (!stats.length) {
+    return null;
+  }
 
   return (
     <div className="grid w-full grid-cols-3 gap-6 md:flex md:w-auto md:max-w-[544px] md:items-center">
@@ -107,9 +110,10 @@ function HeroStats({ stats }: HeroStatsProps) {
             index === 0 ? "md:w-44" : "md:w-40",
           )}
         >
-          <p className="w-full text-center font-inter text-4xl font-medium leading-10 text-black md:text-left md:text-[40px] md:leading-[48px]">
-            {stat.value}
-          </p>
+          <AnimatedNumber
+            value={stat.value}
+            className="w-full text-center font-inter text-4xl font-medium leading-10 text-black md:text-left md:text-[40px] md:leading-[48px]"
+          />
 
           <p className="w-full text-center font-inter text-sm font-normal leading-5 text-gray-500 md:text-left md:text-lg md:leading-7">
             {stat.label}

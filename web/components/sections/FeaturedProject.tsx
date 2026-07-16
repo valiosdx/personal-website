@@ -208,7 +208,7 @@ function ProjectRow({ project }: { project: ProjectItemWithContent }) {
       className="group block w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-700 focus-visible:ring-offset-4"
       aria-label={`Open ${project.title ?? "project"}`}
     >
-      <div className="transition-opacity group-hover:opacity-70">{content}</div>
+      {content}
     </a>
   );
 }
@@ -240,7 +240,7 @@ function FeaturedProjectControls({
               type="button"
               onClick={() => onPageChange(page)}
               className={cn(
-                "h-1.5 rounded-full transition-all duration-300 md:h-2",
+                "interaction-transition h-1.5 rounded-full transition-all md:h-2",
                 isActive
                   ? "w-10 bg-[var(--color-primary-500)]"
                   : "w-1.5 bg-[var(--color-gray-100)] md:w-2",
@@ -258,7 +258,7 @@ function FeaturedProjectControls({
           onClick={() => onPageChange(currentPage - 1)}
           disabled={isFirstPage}
           className={cn(
-            "flex h-10 w-10 items-center justify-center transition-colors md:h-14 md:w-14",
+            "interaction-transition flex h-10 w-10 items-center justify-center transition-colors md:h-14 md:w-14",
             isFirstPage
               ? "cursor-pointer text-[var(--color-gray-500)]"
               : "cursor-pointer text-black",
@@ -273,7 +273,7 @@ function FeaturedProjectControls({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={isLastPage}
           className={cn(
-            "flex h-10 w-10 items-center justify-center transition-colors md:h-14 md:w-14",
+            "interaction-transition flex h-10 w-10 items-center justify-center transition-colors md:h-14 md:w-14",
             isLastPage
               ? "cursor-pointer text-[var(--color-gray-500)]"
               : "cursor-pointer text-black",
