@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState, useSyncExternalStore } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
+import { AnimatedHeading } from "@/components/ui/AnimatedHeading";
 import { Container } from "@/components/ui/Container";
 import {
   carouselTransition,
@@ -87,21 +88,27 @@ function hasCollectionContent(data?: CollectionData) {
 
 function CollectionHeader({ data }: { data?: CollectionData }) {
   return (
-    <div className="flex w-full flex-col items-start gap-5 lg:flex-row lg:items-center lg:justify-between">
+    <motion.div
+      className="flex w-full flex-col items-start gap-5 lg:flex-row lg:items-center lg:justify-between"
+      variants={staggerContainer}
+    >
       {data?.title ? (
-        <h2 className="w-full whitespace-pre-line font-inter text-[32px] font-medium leading-[132%] text-white md:max-w-[510px] md:text-5xl">
+        <AnimatedHeading className="w-full whitespace-pre-line font-inter text-[32px] font-medium leading-[132%] text-white md:max-w-[510px] md:text-5xl">
           {data.title}
-        </h2>
+        </AnimatedHeading>
       ) : null}
 
       {data?.description ? (
-        <div className="flex w-full flex-col items-start justify-center gap-8 md:max-w-[510px]">
+        <motion.div
+          className="flex w-full flex-col items-start justify-center gap-8 md:max-w-[510px]"
+          variants={fadeUp}
+        >
           <p className="w-full font-inter text-base font-normal leading-[150%] text-white/80 md:text-xl md:leading-[120%]">
             {data.description}
           </p>
-        </div>
+        </motion.div>
       ) : null}
-    </div>
+    </motion.div>
   );
 }
 
@@ -351,7 +358,7 @@ export function Collection({ data, className }: CollectionProps) {
     >
       <Container>
         <div className="flex w-full flex-col items-start gap-10 md:gap-14 lg:gap-24">
-          <motion.div className="w-full" variants={fadeUp}>
+          <motion.div className="w-full" variants={staggerContainer}>
             <CollectionHeader data={data} />
           </motion.div>
 
