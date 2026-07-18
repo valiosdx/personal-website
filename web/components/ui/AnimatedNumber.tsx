@@ -55,6 +55,7 @@ export function AnimatedNumber({ value, className }: AnimatedNumberProps) {
   const isInView = useInView(elementRef, {
     once: true,
     amount: 0.5,
+    margin: "0px 0px -15% 0px",
   });
 
   const parsedNumber = useMemo(() => parseAnimatedNumber(value), [value]);

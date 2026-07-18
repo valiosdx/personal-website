@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
+import { AnimatedHeading } from "@/components/ui/AnimatedHeading";
 import { Container } from "@/components/ui/Container";
 import { fadeIn, fadeUp, staggerContainer } from "@/lib/motion";
 import { urlFor } from "@/lib/sanity/image";
@@ -48,27 +49,39 @@ function hasFeaturedProjectContent(data?: FeaturedProjectData) {
 
 function FeaturedProjectHeader({ data }: { data?: FeaturedProjectData }) {
   return (
-    <div className="flex w-full flex-col items-start gap-6">
+    <motion.div
+      className="flex w-full flex-col items-start gap-6"
+      variants={staggerContainer}
+    >
       {data?.sectionLabel ? (
-        <p className="font-inter text-xl font-medium uppercase leading-6 text-gray-500 md:text-2xl md:leading-7">
+        <motion.p
+          className="font-inter text-xl font-medium uppercase leading-6 text-gray-500 md:text-2xl md:leading-7"
+          variants={fadeUp}
+        >
           {data.sectionLabel}
-        </p>
+        </motion.p>
       ) : null}
 
-      <div className="flex w-full flex-col items-start gap-5 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
+      <motion.div
+        className="flex w-full flex-col items-start gap-5 lg:flex-row lg:items-end lg:justify-between lg:gap-10"
+        variants={staggerContainer}
+      >
         {data?.title ? (
-          <h2 className="font-inter w-full text-3xl font-normal leading-10 text-black md:max-w-[461px] md:text-5xl md:leading-[61.6px]">
+          <AnimatedHeading className="font-inter w-full text-3xl font-normal leading-10 text-black md:max-w-[461px] md:text-5xl md:leading-[61.6px]">
             {data.title}
-          </h2>
+          </AnimatedHeading>
         ) : null}
 
         {data?.description ? (
-          <p className="font-inter w-full text-base font-normal leading-6 text-gray-500 md:max-w-[571px] md:text-lg md:leading-7">
+          <motion.p
+            className="font-inter w-full text-base font-normal leading-6 text-gray-500 md:max-w-[571px] md:text-lg md:leading-7"
+            variants={fadeUp}
+          >
             {data.description}
-          </p>
+          </motion.p>
         ) : null}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -83,7 +96,7 @@ function ProjectImage({
     return (
       <div
         className={cn(
-          "flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50",
+          "flex shrink-0 items-center justify-center overflow-hidden rounded-3xl md:rounded-4xl lg:rounded-lg border border-zinc-200 bg-zinc-50",
           variant === "desktop" ? "h-16 w-28" : "h-44 w-full md:h-[361px]",
         )}
       >
@@ -112,7 +125,7 @@ function ProjectImage({
   return (
     <div
       className={cn(
-        "relative shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50",
+        "relative shrink-0 overflow-hidden rounded-3xl md:rounded-3xl lg:rounded-lg bg-zinc-50",
         variant === "desktop" ? "h-16 w-28" : "h-44 w-full md:h-[361px]",
       )}
     >
@@ -138,7 +151,7 @@ function ProjectRowDesktop({ project }: { project: ProjectItemWithContent }) {
         {project.year}
       </p>
 
-      <div className="flex min-w-0 items-center gap-6">
+      <div className="flex min-w-0 items-center gap-6 transition-transform duration-500 ease-out group-hover:translate-x-[50px]">
         <ProjectImage project={project} variant="desktop" />
 
         {project.title ? (
@@ -294,7 +307,8 @@ export function FeaturedProject({ data, className }: FeaturedProjectProps) {
 
   const isInView = useInView(sectionRef, {
     once: true,
-    amount: 0.05,
+    amount: 0.1,
+    margin: "0px 0px -15% 0px",
   });
 
   const projects = data?.projects?.filter(hasProjectContent) ?? [];
@@ -335,7 +349,7 @@ export function FeaturedProject({ data, className }: FeaturedProjectProps) {
     >
       <Container>
         <div className="flex w-full flex-col items-start gap-10 md:gap-14">
-          <motion.div className="w-full" variants={fadeUp}>
+          <motion.div className="w-full" variants={staggerContainer}>
             <FeaturedProjectHeader data={data} />
           </motion.div>
 

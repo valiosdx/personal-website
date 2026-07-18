@@ -2,7 +2,7 @@ import type { Transition, Variants } from "framer-motion";
 
 export const motionDurations = {
   interaction: 0.3,
-  reveal: 0.6,
+  reveal: 0.5,
   counter: 1.2,
 } as const;
 
@@ -12,8 +12,9 @@ export const motionEasings = {
 };
 
 export const motionDelays = {
-  stagger: 0.15,
-  staggerStart: 0.1,
+  stagger: 0.14,
+  staggerStart: 0.15,
+  headingLine: 0.12,
   featureText: 0.2,
   featureImage: 0.3,
 } as const;
@@ -109,7 +110,19 @@ export const aboutButtonIconSecondaryVariants: Variants = {
 
 export const viewportOnce = {
   once: true,
+  amount: 0.35,
+  margin: "0px 0px -15% 0px",
+};
+
+export const footerViewportOnce = {
+  once: true,
   amount: 0.2,
+};
+
+export const tallSectionViewportOnce = {
+  once: true,
+  amount: 0.1,
+  margin: "0px 0px -15% 0px",
 };
 
 export const staggerContainer: Variants = {
@@ -125,11 +138,13 @@ export const staggerContainer: Variants = {
 export const fadeUp: Variants = {
   hidden: {
     opacity: 0,
-    y: 20,
+    y: 24,
+    filter: "blur(10px)",
   },
   show: {
     opacity: 1,
     y: 0,
+    filter: "blur(0px)",
     transition: revealTransition,
   },
 };
@@ -137,21 +152,47 @@ export const fadeUp: Variants = {
 export const fadeIn: Variants = {
   hidden: {
     opacity: 0,
+    filter: "blur(8px)",
   },
   show: {
     opacity: 1,
+    filter: "blur(0px)",
     transition: revealTransition,
   },
+};
+
+export const headingContainerVariants: Variants = {
+  hidden: {},
+  show: {},
+};
+
+export const headingLineVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: "0.45em",
+    filter: "blur(10px)",
+  },
+  show: (lineIndex: number = 0) => ({
+    opacity: 1,
+    y: "0em",
+    filter: "blur(0px)",
+    transition: {
+      ...revealTransition,
+      delay: lineIndex * motionDelays.headingLine,
+    },
+  }),
 };
 
 export const featureTextVariants: Variants = {
   hidden: {
     opacity: 0,
-    y: 20,
+    y: 24,
+    filter: "blur(10px)",
   },
   show: {
     opacity: 1,
     y: 0,
+    filter: "blur(0px)",
     transition: {
       ...revealTransition,
       delay: motionDelays.featureText,
@@ -162,11 +203,15 @@ export const featureTextVariants: Variants = {
 export const featureImageVariants: Variants = {
   hidden: {
     opacity: 0,
-    scale: 0.95,
+    y: 24,
+    scale: 0.97,
+    filter: "blur(10px)",
   },
   show: {
     opacity: 1,
+    y: 0,
     scale: 1,
+    filter: "blur(0px)",
     transition: {
       ...revealTransition,
       delay: motionDelays.featureImage,
