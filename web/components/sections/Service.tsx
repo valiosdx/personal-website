@@ -2,8 +2,13 @@
 
 import { motion } from "framer-motion";
 
+import { AnimatedHeading } from "@/components/ui/AnimatedHeading";
 import { Container } from "@/components/ui/Container";
-import { fadeUp, staggerContainer, viewportOnce } from "@/lib/motion";
+import {
+  fadeUp,
+  staggerContainer,
+  tallSectionViewportOnce,
+} from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
 
@@ -59,12 +64,11 @@ function ServiceHeader({ data }: { data?: ServiceData }) {
         variants={staggerContainer}
       >
         {data?.title ? (
-          <motion.h2
+          <AnimatedHeading
             className="font-inter w-full text-[32px] font-normal leading-[140%] text-black md:text-[44px] md:leading-[140%] lg:max-w-[571px]"
-            variants={fadeUp}
           >
             {data.title}
-          </motion.h2>
+          </AnimatedHeading>
         ) : null}
 
         {data?.description ? (
@@ -155,7 +159,7 @@ export function Service({ data, className }: ServiceProps) {
       variants={staggerContainer}
       initial="hidden"
       whileInView="show"
-      viewport={viewportOnce}
+      viewport={tallSectionViewportOnce}
     >
       <Container>
         <div className="flex w-full flex-col items-center gap-14 md:gap-24">

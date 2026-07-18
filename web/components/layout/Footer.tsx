@@ -3,7 +3,12 @@
 import { motion } from "framer-motion";
 
 import { Container } from "@/components/ui/Container";
-import { fadeIn, fadeUp, staggerContainer, viewportOnce } from "@/lib/motion";
+import {
+  fadeIn,
+  fadeUp,
+  footerViewportOnce,
+  staggerContainer,
+} from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
 
@@ -47,7 +52,7 @@ export function Footer({ data, className }: FooterProps) {
       variants={staggerContainer}
       initial="hidden"
       whileInView="show"
-      viewport={viewportOnce}
+      viewport={footerViewportOnce}
     >
       <Container>
         <motion.div

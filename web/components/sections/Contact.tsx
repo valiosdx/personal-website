@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 
+import { AnimatedHeading } from "@/components/ui/AnimatedHeading";
 import { Container } from "@/components/ui/Container";
 import { fadeIn, fadeUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -56,7 +57,7 @@ export function Contact({ data, className }: ContactProps) {
             variants={staggerContainer}
           >
             {data?.title ? (
-              <motion.h2
+              <AnimatedHeading
                 id="contact-title"
                 className={cn(
                   "w-full font-inter font-medium",
@@ -71,10 +72,9 @@ export function Contact({ data, className }: ContactProps) {
                   // Desktop
                   "lg:max-w-[777px]",
                 )}
-                variants={fadeUp}
               >
                 {data.title}
-              </motion.h2>
+              </AnimatedHeading>
             ) : null}
 
             {data?.description ? (

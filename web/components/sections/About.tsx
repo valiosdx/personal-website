@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MdArrowOutward } from "react-icons/md";
 
+import { AnimatedHeading } from "@/components/ui/AnimatedHeading";
 import { Container } from "@/components/ui/Container";
 import { getButtonHref } from "@/lib/button";
 import {
@@ -180,19 +181,20 @@ function AboutHeadline({
 
   if (!parts) return null;
 
+  const fullHeadline = [parts.muted, parts.strong].filter(Boolean).join(" ");
+
   return (
-    <p
+    <AnimatedHeading
       className={cn(
         "w-full font-inter text-[28px] font-normal leading-[140%] md:text-4xl lg:max-w-[775px] lg:text-[40px]",
         className,
       )}
+      mutedText={parts.muted}
+      mutedClassName="text-[var(--color-gray-500)]"
+      strongClassName="text-[var(--color-gray-900)]"
     >
-      {parts.muted ? (
-        <span className="text-[var(--color-gray-500)]">{parts.muted} </span>
-      ) : null}
-
-      <span className="text-[var(--color-gray-900)]">{parts.strong}</span>
-    </p>
+      {fullHeadline}
+    </AnimatedHeading>
   );
 }
 
@@ -241,7 +243,10 @@ function AboutDesktop({ data }: { data?: AboutData }) {
         <AboutButton button={data?.button} />
       </motion.div>
 
-      <motion.div className="w-full lg:max-w-[775px]" variants={fadeUp}>
+      <motion.div
+        className="w-full lg:max-w-[775px]"
+        variants={staggerContainer}
+      >
         <AboutHeadline headline={data?.headline} />
       </motion.div>
     </motion.div>
@@ -263,7 +268,7 @@ function AboutResponsive({ data }: { data?: AboutData }) {
         </motion.p>
       ) : null}
 
-      <motion.div className="w-full" variants={fadeUp}>
+      <motion.div className="w-full" variants={staggerContainer}>
         <AboutHeadline headline={data?.headline} />
       </motion.div>
 
