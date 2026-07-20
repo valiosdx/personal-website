@@ -7,7 +7,12 @@ import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
 import { AnimatedHeading } from "@/components/ui/AnimatedHeading";
 import { Container } from "@/components/ui/Container";
-import { fadeIn, fadeUp, staggerContainer } from "@/lib/motion";
+import {
+  fadeUp,
+  featuredProjectControlsVariants,
+  featuredProjectListVariants,
+  staggerContainer,
+} from "@/lib/motion";
 import { urlFor } from "@/lib/sanity/image";
 import { cn } from "@/lib/utils";
 import type { Homepage } from "@/types/homepage";
@@ -151,7 +156,7 @@ function ProjectRowDesktop({ project }: { project: ProjectItemWithContent }) {
         {project.year}
       </p>
 
-      <div className="flex min-w-0 items-center gap-6 transition-transform duration-500 ease-out group-hover:translate-x-[50px]">
+      <div className="flex min-w-0 items-center gap-6 transition-transform duration-300 ease-out group-hover:translate-x-5">
         <ProjectImage project={project} variant="desktop" />
 
         {project.title ? (
@@ -210,7 +215,7 @@ function ProjectRow({ project }: { project: ProjectItemWithContent }) {
   );
 
   if (!project.url) {
-    return content;
+    return <div className="group w-full">{content}</div>;
   }
 
   return (
@@ -357,8 +362,8 @@ export function FeaturedProject({ data, className }: FeaturedProjectProps) {
             <motion.div
               key={safeCurrentPage}
               className="flex w-full flex-col items-start gap-5"
-              variants={staggerContainer}
-              initial="hidden"
+              variants={featuredProjectListVariants}
+              initial={isInView ? false : "hidden"}
               animate={isInView ? "show" : "hidden"}
               aria-live="polite"
               aria-label={`Project page ${safeCurrentPage + 1} of ${totalPages}`}
@@ -376,7 +381,10 @@ export function FeaturedProject({ data, className }: FeaturedProjectProps) {
           ) : null}
 
           {totalPages > 0 ? (
-            <motion.div className="w-full" variants={fadeIn}>
+            <motion.div
+              className="w-full"
+              variants={featuredProjectControlsVariants}
+            >
               <FeaturedProjectControls
                 currentPage={safeCurrentPage}
                 totalPages={totalPages}
