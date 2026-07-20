@@ -9,7 +9,9 @@ import { AnimatedHeading } from "@/components/ui/AnimatedHeading";
 import { Container } from "@/components/ui/Container";
 import {
   carouselTransition,
-  fadeIn,
+  collectionCardVariants,
+  collectionCarouselVariants,
+  collectionControlsVariants,
   fadeUp,
   staggerContainer,
   viewportOnce,
@@ -216,9 +218,8 @@ function CollectionCarousel({
   );
 
   return (
-    <motion.div
+    <div
       className="w-full overflow-hidden"
-      variants={fadeIn}
       aria-live="polite"
       aria-label={`Collection page ${currentPage + 1}`}
     >
@@ -238,16 +239,25 @@ function CollectionCarousel({
               aria-hidden={!isActivePage}
               inert={!isActivePage}
             >
-              <div className="flex w-full flex-col items-stretch gap-6 lg:grid lg:grid-cols-3 lg:gap-5">
+              <motion.div
+                className="flex w-full flex-col items-stretch gap-6 lg:grid lg:grid-cols-3 lg:gap-5"
+                variants={collectionCarouselVariants}
+              >
                 {pageItems.map((item) => (
-                  <CollectionCard key={item._key} item={item} />
+                  <motion.div
+                    key={item._key}
+                    className="h-full"
+                    variants={collectionCardVariants}
+                  >
+                    <CollectionCard item={item} />
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
           );
         })}
       </motion.div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -369,7 +379,10 @@ export function Collection({ data, className }: CollectionProps) {
           />
 
           {items.length ? (
-            <motion.div className="w-full" variants={fadeIn}>
+            <motion.div
+              className="w-full"
+              variants={collectionControlsVariants}
+            >
               <CollectionControls
                 currentPage={currentPage}
                 totalPages={totalPages}

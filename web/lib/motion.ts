@@ -2,8 +2,8 @@ import type { Transition, Variants } from "framer-motion";
 
 export const motionDurations = {
   interaction: 0.3,
-  reveal: 0.5,
-  counter: 1.2,
+  reveal: 0.7,
+  counter: 1.4,
 } as const;
 
 export const motionEasings = {
@@ -12,11 +12,11 @@ export const motionEasings = {
 };
 
 export const motionDelays = {
-  stagger: 0.14,
-  staggerStart: 0.15,
-  headingLine: 0.12,
-  featureText: 0.2,
-  featureImage: 0.3,
+  stagger: 0.08,
+  staggerStart: 0.1,
+  headingLine: 0.08,
+  featureText: 0.12,
+  featureImage: 0.2,
 } as const;
 
 export const revealTransition: Transition = {
@@ -131,6 +131,96 @@ export const staggerContainer: Variants = {
     transition: {
       staggerChildren: motionDelays.stagger,
       delayChildren: motionDelays.staggerStart,
+    },
+  },
+};
+
+export const navbarSlideDown: Variants = {
+  hidden: {
+    opacity: 0,
+    y: -24,
+    filter: "blur(8px)",
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: revealTransition,
+  },
+};
+
+export const serviceListVariants: Variants = {
+  hidden: {},
+  show: {
+    transition: {
+      delayChildren: 0.7,
+      staggerChildren: motionDelays.stagger,
+    },
+  },
+};
+
+export const collectionCarouselVariants: Variants = {
+  hidden: {},
+  show: {
+    transition: {
+      delayChildren: 0.85,
+      staggerChildren: motionDelays.stagger,
+    },
+  },
+};
+
+export const collectionCardVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 28,
+    scale: 0.98,
+    filter: "blur(10px)",
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: revealTransition,
+  },
+};
+
+export const collectionControlsVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    filter: "blur(8px)",
+  },
+  show: {
+    opacity: 1,
+    filter: "blur(0px)",
+    transition: {
+      ...revealTransition,
+      delay: 1.2,
+    },
+  },
+};
+
+export const featuredProjectListVariants: Variants = {
+  hidden: {},
+  show: {
+    transition: {
+      delayChildren: 0.9,
+      staggerChildren: motionDelays.stagger,
+    },
+  },
+};
+
+export const featuredProjectControlsVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    filter: "blur(8px)",
+  },
+  show: {
+    opacity: 1,
+    filter: "blur(0px)",
+    transition: {
+      ...revealTransition,
+      delay: 1.15,
     },
   },
 };

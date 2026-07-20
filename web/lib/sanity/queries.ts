@@ -1,5 +1,31 @@
 import { groq } from "next-sanity";
 
+export const SITE_SETTINGS_QUERY = groq`
+*[_type == "siteSetting"][0] {
+  siteName,
+  seoTitle,
+  seoDescription,
+
+  favicon {
+    asset->{
+      url
+    }
+  },
+
+  ogImage {
+    asset->{
+      url,
+      metadata {
+        dimensions {
+          width,
+          height
+        }
+      }
+    }
+  }
+}
+`;
+
 export const HOMEPAGE_QUERY = groq`
 *[_type == "homePage"][0]{
     header {

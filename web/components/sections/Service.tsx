@@ -6,6 +6,7 @@ import { AnimatedHeading } from "@/components/ui/AnimatedHeading";
 import { Container } from "@/components/ui/Container";
 import {
   fadeUp,
+  serviceListVariants,
   staggerContainer,
   tallSectionViewportOnce,
 } from "@/lib/motion";
@@ -132,7 +133,7 @@ function ServiceList({ services }: { services: ServiceItemWithContent[] }) {
   return (
     <motion.div
       className="flex w-full flex-col items-start gap-10 md:gap-14 lg:grid lg:grid-cols-[384px_384px] lg:gap-x-24 lg:gap-y-14 lg:pl-48"
-      variants={staggerContainer}
+      variants={serviceListVariants}
     >
       {services.map((service, index) => (
         <ServiceCard

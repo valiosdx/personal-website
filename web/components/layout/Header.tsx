@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { getButtonHref } from "@/lib/button";
-import { fadeUp, staggerContainer } from "@/lib/motion";
+import { navbarSlideDown } from "@/lib/motion";
 import type { HeaderButton } from "@/types/homepage";
 
 type HeaderData = {
@@ -23,26 +23,20 @@ export function Header({ data }: HeaderProps) {
   return (
     <motion.header
       className="w-full pt-6 md:pt-10"
-      variants={staggerContainer}
+      variants={navbarSlideDown}
       initial="hidden"
       animate="show"
     >
       <Container>
-        <motion.div
-          className="flex w-full items-center justify-between gap-4"
-          variants={staggerContainer}
-        >
+        <div className="flex w-full items-center justify-between gap-4">
           {data?.name ? (
-            <motion.h1
-              className="shrink-0 font-inter text-2xl font-medium leading-7 text-[var(--color-primary-500)]"
-              variants={fadeUp}
-            >
+            <h1 className="shrink-0 font-inter text-2xl font-medium leading-7 text-[var(--color-primary-500)]">
               {data.name}
-            </motion.h1>
+            </h1>
           ) : null}
 
           {button?.label ? (
-            <motion.div variants={fadeUp}>
+            <div>
               <Button
                 href={getButtonHref(button)}
                 size="sm"
@@ -50,9 +44,9 @@ export function Header({ data }: HeaderProps) {
               >
                 {button.label}
               </Button>
-            </motion.div>
+            </div>
           ) : null}
-        </motion.div>
+        </div>
       </Container>
     </motion.header>
   );
