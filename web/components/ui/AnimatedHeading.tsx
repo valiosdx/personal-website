@@ -14,6 +14,7 @@ type AnimatedHeadingProps = Omit<
   "children" | "variants"
 > & {
   children: string;
+  as?: "h1" | "h2";
   mutedText?: string;
   mutedClassName?: string;
   strongClassName?: string;
@@ -25,6 +26,7 @@ function getWords(value: string) {
 
 export function AnimatedHeading({
   children,
+  as = "h2",
   className,
   mutedText,
   mutedClassName,
@@ -44,6 +46,8 @@ export function AnimatedHeading({
   const [lineIndexes, setLineIndexes] = useState<number[]>(() =>
     words.map(() => 0),
   );
+
+  const MotionHeading = as === "h1" ? motion.h1 : motion.h2;
 
   useLayoutEffect(() => {
     const heading = headingRef.current;
@@ -92,7 +96,7 @@ export function AnimatedHeading({
   }, [words]);
 
   return (
-    <motion.h2
+    <MotionHeading
       ref={headingRef}
       className={className}
       variants={headingContainerVariants}
@@ -119,6 +123,6 @@ export function AnimatedHeading({
           {index < words.length - 1 ? " " : null}
         </span>
       ))}
-    </motion.h2>
+    </MotionHeading>
   );
 }
