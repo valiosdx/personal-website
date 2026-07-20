@@ -69,7 +69,10 @@ function HeroTitleBlock({ badge, title }: HeroTitleBlockProps) {
       ) : null}
 
       {title ? (
-        <AnimatedHeading className="max-w-[632px] font-inter text-4xl font-medium uppercase leading-[50.4px] text-[var(--color-base-black)] md:text-5xl md:leading-[67.2px]">
+        <AnimatedHeading
+          as="h1"
+          className="max-w-[632px] font-inter text-4xl font-medium uppercase leading-[50.4px] text-[var(--color-base-black)] md:text-5xl md:leading-[67.2px]"
+        >
           {title}
         </AnimatedHeading>
       ) : null}
