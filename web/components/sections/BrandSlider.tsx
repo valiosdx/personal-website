@@ -105,8 +105,6 @@ export function BrandSlider({ data, className }: BrandSliderProps) {
 
       <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-linear-to-r from-white to-transparent md:w-44" />
 
-      <div className="pointer-events-noneName=pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-linear-to-r from-white to-transparent md:w-44" />
-
       <div className="pointer-events absolute inset-y-0 right-0 z-10 w-24 bg-linear-to-l from-white to-transparent md:w-44" />
     </section>
   );

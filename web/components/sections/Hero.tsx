@@ -135,7 +135,7 @@ function HeroStats({ stats }: HeroStatsProps) {
             className="w-full text-center font-inter text-4xl font-medium leading-10 text-black md:text-left md:text-[40px] md:leading-[48px]"
           />
 
-          <p className="w-full text-center font-inter text-sm font-normal leading-5 text-gray-500 md:text-left md:text-lg md:leading-7">
+          <p className="w-full text-center font-inter text-sm font-normal leading-5 text-[var(--color-gray-700)] md:text-left md:text-lg md:leading-7">
             {stat.label}
           </p>
         </motion.div>
@@ -145,7 +145,9 @@ function HeroStats({ stats }: HeroStatsProps) {
 }
 
 function HeroImage({ imageUrl, title }: HeroImageProps) {
-  if (!imageUrl) return null;
+  if (!imageUrl) {
+    return null;
+  }
 
   return (
     <div className="relative h-80 w-full overflow-hidden rounded-xl">
@@ -162,7 +164,9 @@ function HeroImage({ imageUrl, title }: HeroImageProps) {
 }
 
 export function Hero({ data, className }: HeroProps) {
-  if (!hasHeroContent(data)) return null;
+  if (!hasHeroContent(data)) {
+    return null;
+  }
 
   const stats = data?.stats?.filter((stat) => stat?.value && stat?.label) ?? [];
 
@@ -198,13 +202,13 @@ export function Hero({ data, className }: HeroProps) {
 
         {/* Desktop */}
         <motion.div
-          className="hidden lg:flex lg:items-end lg:gap-32"
+          className="hidden lg:grid lg:grid-cols-[minmax(0,632px)_minmax(240px,482px)] lg:items-end lg:gap-8 xl:gap-16 2xl:gap-32"
           variants={staggerContainer}
           initial="hidden"
           animate="show"
         >
           <motion.div
-            className="flex w-[632px] flex-col items-start gap-72"
+            className="flex w-full min-w-0 flex-col items-start gap-72"
             variants={staggerContainer}
           >
             <HeroTitleBlock badge={data?.badge} title={data?.title} />
@@ -213,7 +217,7 @@ export function Hero({ data, className }: HeroProps) {
           </motion.div>
 
           <motion.div
-            className="flex w-[482px] flex-col items-start gap-40"
+            className="flex w-full min-w-0 flex-col items-start gap-40"
             variants={staggerContainer}
           >
             <motion.div className="w-full" variants={featureImageVariants}>

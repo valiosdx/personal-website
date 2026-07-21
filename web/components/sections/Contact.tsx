@@ -80,14 +80,11 @@ export function Contact({ data, className }: ContactProps) {
             {data?.description ? (
               <motion.p
                 className={cn(
-                  "w-full font-inter text-base font-normal leading-[150%]",
+                  "w-full font-inter text-base font-semibold leading-[150%]",
                   "text-[var(--color-gray-700)]",
 
                   // Tablet
-                  "md:max-w-96 md:text-xl md:font-semibold md:leading-[120%]",
-
-                  // Desktop
-                  "lg:max-w-96",
+                  "md:max-w-[372px] md:text-xl md:font-semibold md:leading-[120%]",
                 )}
                 variants={fadeUp}
               >

@@ -28,15 +28,15 @@ export function Header({ data }: HeaderProps) {
       animate="show"
     >
       <Container>
-        <div className="flex w-full items-center justify-between gap-4">
+        <div className="flex w-full min-w-0 items-center justify-between gap-4">
           {data?.name ? (
-            <h1 className="shrink-0 font-inter text-2xl font-medium leading-7 text-[var(--color-primary-500)]">
+            <h1 className="min-w-0 flex-1 break-words font-inter text-2xl font-medium leading-7 text-black [overflow-wrap:anywhere]">
               {data.name}
             </h1>
           ) : null}
 
           {button?.label ? (
-            <div>
+            <div className="shrink-0">
               <Button
                 href={getButtonHref(button)}
                 size="sm"
