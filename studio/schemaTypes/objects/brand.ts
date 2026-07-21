@@ -9,6 +9,9 @@ export const brand = defineType({
       name: 'logo',
       title: 'Logo',
       type: 'image',
+      options: {
+        accept: 'image/png, image/webp, image/avif, image/svg+xml',
+      },
     }),
     defineField({
       name: 'alt',

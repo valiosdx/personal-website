@@ -25,7 +25,10 @@ export const about = defineType({
       name: 'image',
       title: 'Image',
       type: 'image',
-      options: {hotspot: true},
+      options: {
+        hotspot: true,
+        accept: 'image/jpeg, image/png, image/webp, image/svg+xml, image/avif, image/jpg',
+      },
     }),
   ],
 })
