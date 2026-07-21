@@ -14,7 +14,10 @@ export const projectItem = defineType({
       name: 'thumbnail',
       title: 'Thumbnail',
       type: 'image',
-      options: {hotspot: true},
+      options: {
+        hotspot: true,
+        accept: 'image/jpeg, image/png, image/webp, image/svg+xml, image/avif, image/jpg',
+      },
     }),
     defineField({
       name: 'title',

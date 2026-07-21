@@ -93,7 +93,7 @@ export function Footer({ data, className }: FooterProps) {
 
             {data?.rightText ? (
               <motion.p
-                className="font-inter text-base font-medium leading-7 text-[var(--color-gray-500)] md:text-lg"
+                className="font-inter text-base font-medium leading-7 text-[var(--color-gray-700)] md:text-lg"
                 variants={fadeUp}
               >
                 {data.rightText}

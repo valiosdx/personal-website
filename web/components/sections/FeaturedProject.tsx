@@ -2,7 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
 import { AnimatedHeading } from "@/components/ui/AnimatedHeading";
@@ -24,7 +24,9 @@ type FeaturedProjectProps = {
   className?: string;
 };
 
-const PROJECTS_PER_PAGE = 5;
+const MOBILE_PROJECTS_PER_PAGE = 3;
+const DEFAULT_PROJECTS_PER_PAGE = 5;
+const MOBILE_BREAKPOINT = "(max-width: 1023px)";
 
 type ProjectItem = NonNullable<
   NonNullable<FeaturedProjectData>["projects"]
@@ -33,6 +35,34 @@ type ProjectItem = NonNullable<
 type ProjectItemWithContent = ProjectItem & {
   _key: string;
 };
+
+function subscribeToMobileBreakpoint(callback: () => void) {
+  const mediaQuery = window.matchMedia(MOBILE_BREAKPOINT);
+
+  mediaQuery.addEventListener("change", callback);
+
+  return () => {
+    mediaQuery.removeEventListener("change", callback);
+  };
+}
+
+function getMobileSnapshot() {
+  return window.matchMedia(MOBILE_BREAKPOINT).matches;
+}
+
+function getServerMobileSnapshot() {
+  return false;
+}
+
+function useProjectsPerPage() {
+  const isMobile = useSyncExternalStore(
+    subscribeToMobileBreakpoint,
+    getMobileSnapshot,
+    getServerMobileSnapshot,
+  );
+
+  return isMobile ? MOBILE_PROJECTS_PER_PAGE : DEFAULT_PROJECTS_PER_PAGE;
+}
 
 function hasProjectContent(
   project: ProjectItem,
@@ -60,7 +90,7 @@ function FeaturedProjectHeader({ data }: { data?: FeaturedProjectData }) {
     >
       {data?.sectionLabel ? (
         <motion.p
-          className="font-inter text-xl font-medium uppercase leading-6 text-gray-500 md:text-2xl md:leading-7"
+          className="font-inter text-xl font-medium uppercase leading-6 text-[var(--color-gray-700)] md:text-2xl md:leading-7"
           variants={fadeUp}
         >
           {data.sectionLabel}
@@ -72,14 +102,14 @@ function FeaturedProjectHeader({ data }: { data?: FeaturedProjectData }) {
         variants={staggerContainer}
       >
         {data?.title ? (
-          <AnimatedHeading className="font-inter w-full text-3xl font-normal leading-10 text-black md:max-w-[461px] md:text-5xl md:leading-[61.6px]">
+          <AnimatedHeading className="font-inter w-full text-[32px] font-normal leading-[140%] text-black md:max-w-full md:text-[44px]">
             {data.title}
           </AnimatedHeading>
         ) : null}
 
         {data?.description ? (
           <motion.p
-            className="font-inter w-full text-base font-normal leading-6 text-gray-500 md:max-w-[571px] md:text-lg md:leading-7"
+            className="font-inter w-full text-base font-normal leading-6 text-[var(--color-gray-700)] md:max-w-[571px] md:text-lg md:leading-7"
             variants={fadeUp}
           >
             {data.description}
@@ -101,7 +131,7 @@ function ProjectImage({
     return (
       <div
         className={cn(
-          "flex shrink-0 items-center justify-center overflow-hidden rounded-3xl md:rounded-4xl lg:rounded-lg border border-zinc-200 bg-zinc-50",
+          "flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50",
           variant === "desktop" ? "h-16 w-28" : "h-44 w-full md:h-[361px]",
         )}
       >
@@ -130,7 +160,7 @@ function ProjectImage({
   return (
     <div
       className={cn(
-        "relative shrink-0 overflow-hidden rounded-3xl md:rounded-3xl lg:rounded-lg bg-zinc-50",
+        "relative shrink-0 overflow-hidden rounded-lg bg-zinc-50",
         variant === "desktop" ? "h-16 w-28" : "h-44 w-full md:h-[361px]",
       )}
     >
@@ -243,7 +273,6 @@ function FeaturedProjectControls({
   onPageChange,
 }: FeaturedProjectControlsProps) {
   const isFirstPage = currentPage === 0;
-
   const isLastPage = currentPage === totalPages - 1;
 
   return (
@@ -307,6 +336,7 @@ function FeaturedProjectControls({
 
 export function FeaturedProject({ data, className }: FeaturedProjectProps) {
   const [currentPage, setCurrentPage] = useState(0);
+  const projectsPerPage = useProjectsPerPage();
 
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -318,15 +348,15 @@ export function FeaturedProject({ data, className }: FeaturedProjectProps) {
 
   const projects = data?.projects?.filter(hasProjectContent) ?? [];
 
-  const totalPages = Math.ceil(projects.length / PROJECTS_PER_PAGE);
+  const totalPages = Math.ceil(projects.length / projectsPerPage);
 
   const safeCurrentPage = Math.min(currentPage, Math.max(totalPages - 1, 0));
 
-  const firstProjectIndex = safeCurrentPage * PROJECTS_PER_PAGE;
+  const firstProjectIndex = safeCurrentPage * projectsPerPage;
 
   const visibleProjects = projects.slice(
     firstProjectIndex,
-    firstProjectIndex + PROJECTS_PER_PAGE,
+    firstProjectIndex + projectsPerPage,
   );
 
   if (!hasFeaturedProjectContent(data)) {
@@ -360,13 +390,15 @@ export function FeaturedProject({ data, className }: FeaturedProjectProps) {
 
           {visibleProjects.length ? (
             <motion.div
-              key={safeCurrentPage}
+              key={`${safeCurrentPage}-${projectsPerPage}`}
               className="flex w-full flex-col items-start gap-5"
               variants={featuredProjectListVariants}
               initial={isInView ? false : "hidden"}
               animate={isInView ? "show" : "hidden"}
               aria-live="polite"
-              aria-label={`Project page ${safeCurrentPage + 1} of ${totalPages}`}
+              aria-label={`Project page ${
+                safeCurrentPage + 1
+              } of ${totalPages}`}
             >
               {visibleProjects.map((project) => (
                 <motion.div

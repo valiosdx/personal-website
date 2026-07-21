@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
 import { AnimatedHeading } from "@/components/ui/AnimatedHeading";
@@ -35,7 +35,6 @@ type CollectionItemWithContent = CollectionItem & {
 
 function subscribeToViewport(callback: () => void) {
   const tabletQuery = window.matchMedia("(min-width: 768px)");
-
   const desktopQuery = window.matchMedia("(min-width: 1024px)");
 
   tabletQuery.addEventListener("change", callback);
@@ -43,7 +42,6 @@ function subscribeToViewport(callback: () => void) {
 
   return () => {
     tabletQuery.removeEventListener("change", callback);
-
     desktopQuery.removeEventListener("change", callback);
   };
 }
@@ -95,7 +93,7 @@ function CollectionHeader({ data }: { data?: CollectionData }) {
       variants={staggerContainer}
     >
       {data?.title ? (
-        <AnimatedHeading className="w-full whitespace-pre-line font-inter text-[32px] font-medium leading-[132%] text-white md:max-w-[510px] md:text-5xl">
+        <AnimatedHeading className="w-full whitespace-pre-line font-inter text-[32px] font-medium leading-[132%] text-white md:max-w-[510px] md:text-[44px]">
           {data.title}
         </AnimatedHeading>
       ) : null}
@@ -125,12 +123,7 @@ function CollectionImage({ item }: { item: CollectionItemWithContent }) {
     );
   }
 
-  const imageUrl = urlFor(item.image)
-    .width(900)
-    .height(620)
-    .fit("crop")
-    .auto("format")
-    .url();
+  const imageUrl = urlFor(item.image).width(900).auto("format").url();
 
   return (
     <div className="relative h-60 w-full shrink-0 overflow-hidden rounded-lg bg-neutral-500 md:flex-1 lg:flex-none">
@@ -145,55 +138,137 @@ function CollectionImage({ item }: { item: CollectionItemWithContent }) {
   );
 }
 
+function ExpandableDescription({
+  description,
+  descriptionId,
+}: {
+  description: string;
+  descriptionId: string;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [hasOverflow, setHasOverflow] = useState(false);
+
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const descriptionElement = descriptionRef.current;
+
+    if (!descriptionElement || isExpanded) {
+      return;
+    }
+
+    function checkOverflow() {
+      if (!descriptionElement) {
+        return;
+      }
+
+      const isOverflowing =
+        descriptionElement.scrollHeight > descriptionElement.clientHeight + 1;
+
+      setHasOverflow(isOverflowing);
+    }
+
+    checkOverflow();
+
+    const resizeObserver = new ResizeObserver(checkOverflow);
+
+    resizeObserver.observe(descriptionElement);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [description, isExpanded]);
+
+  function handleToggle() {
+    setIsExpanded((currentValue) => !currentValue);
+  }
+
+  return (
+    <div className="relative z-20 flex w-full min-w-0 flex-col items-start gap-3">
+      <p
+        ref={descriptionRef}
+        id={descriptionId}
+        className={cn(
+          "w-full min-w-0 break-words font-inter text-base font-normal leading-6 text-white/80 [overflow-wrap:anywhere]",
+          !isExpanded && "line-clamp-3",
+        )}
+      >
+        {description}
+      </p>
+
+      {hasOverflow || isExpanded ? (
+        <button
+          type="button"
+          onClick={handleToggle}
+          className={cn(
+            "interaction-transition font-inter text-sm font-medium",
+            "text-white underline decoration-white/50 underline-offset-4",
+            "transition-colors hover:decoration-white",
+            "focus-visible:outline-none focus-visible:ring-2",
+            "focus-visible:ring-white focus-visible:ring-offset-2",
+            "focus-visible:ring-offset-[#4B5A50]",
+          )}
+          aria-expanded={isExpanded}
+          aria-controls={descriptionId}
+        >
+          {isExpanded ? "Read Less" : "Read More"}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 function CollectionCard({ item }: { item: CollectionItemWithContent }) {
-  const content = (
+  const descriptionId = `collection-description-${item._key}`;
+
+  return (
     <article
       className={cn(
-        "flex h-full w-full flex-col items-start gap-5",
+        "group relative flex h-full w-full min-w-0 flex-col items-start gap-5",
         "rounded-xl border border-[#DBDEE21F]/12 bg-[#4B5A50] p-5",
+        "interaction-transition transition-opacity hover:opacity-80",
         "md:flex-row md:items-start",
         "lg:flex-col",
       )}
     >
       <CollectionImage item={item} />
 
-      <div className="flex w-full flex-col items-start gap-1 md:flex-1 md:self-stretch md:justify-between md:gap-4 md:py-4 lg:flex-none lg:justify-start lg:gap-1 lg:py-0">
+      <div
+        className={cn(
+          "flex w-full min-w-0 flex-col items-start gap-1",
+          "md:flex-1 md:self-stretch md:justify-between md:gap-4 md:py-4",
+          "lg:flex-none lg:justify-start lg:gap-1 lg:py-0",
+        )}
+      >
         {item.title ? (
-          <h3 className="w-full whitespace-pre-line font-inter text-2xl font-semibold leading-7 text-white">
+          <h3 className="w-full min-w-0 break-words whitespace-pre-line font-inter text-2xl font-semibold leading-7 text-white [overflow-wrap:anywhere]">
             {item.title}
           </h3>
         ) : null}
 
         {item.description ? (
-          <p className="w-full font-inter text-base font-normal leading-6 text-white/80">
-            {item.description}
-          </p>
+          <ExpandableDescription
+            description={item.description}
+            descriptionId={descriptionId}
+          />
         ) : null}
       </div>
+
+      {item.url ? (
+        <a
+          href={item.url}
+          target="_blank"
+          rel="noreferrer"
+          className={cn(
+            "absolute inset-0 z-10 rounded-xl",
+            "focus-visible:outline-none focus-visible:ring-2",
+            "focus-visible:ring-white focus-visible:ring-offset-4",
+            "focus-visible:ring-offset-neutral-700",
+          )}
+          aria-label={`Open ${item.title ?? "collection"}`}
+        />
+      ) : null}
     </article>
-  );
-
-  if (!item.url) {
-    return content;
-  }
-
-  return (
-    <a
-      href={item.url}
-      target="_blank"
-      rel="noreferrer"
-      className={cn(
-        "group block h-full w-full",
-        "focus-visible:outline-none focus-visible:ring-2",
-        "focus-visible:ring-white focus-visible:ring-offset-4",
-        "focus-visible:ring-offset-neutral-700",
-      )}
-      aria-label={`Open ${item.title ?? "collection"}`}
-    >
-      <div className="interaction-transition h-full transition-opacity group-hover:opacity-80">
-        {content}
-      </div>
-    </a>
   );
 }
 
@@ -206,10 +281,14 @@ function CollectionCarousel({
   currentPage: number;
   itemsPerPage: number;
 }) {
-  if (!items.length) return null;
+  if (!items.length) {
+    return null;
+  }
 
   const pages = Array.from(
-    { length: Math.ceil(items.length / itemsPerPage) },
+    {
+      length: Math.ceil(items.length / itemsPerPage),
+    },
     (_, page) => {
       const firstItemIndex = page * itemsPerPage;
 
@@ -226,7 +305,9 @@ function CollectionCarousel({
       <motion.div
         className="-ml-6 flex items-stretch"
         initial={false}
-        animate={{ x: `-${currentPage * 100}%` }}
+        animate={{
+          x: `-${currentPage * 100}%`,
+        }}
         transition={carouselTransition}
       >
         {pages.map((pageItems, page) => {
@@ -240,13 +321,16 @@ function CollectionCarousel({
               inert={!isActivePage}
             >
               <motion.div
+                key={`collection-layout-${itemsPerPage}-${page}`}
                 className="flex w-full flex-col items-stretch gap-6 lg:grid lg:grid-cols-3 lg:gap-5"
                 variants={collectionCarouselVariants}
+                initial="hidden"
+                animate="show"
               >
                 {pageItems.map((item) => (
                   <motion.div
                     key={item._key}
-                    className="h-full"
+                    className="h-full min-w-0"
                     variants={collectionCardVariants}
                   >
                     <CollectionCard item={item} />
@@ -306,7 +390,9 @@ function CollectionControls({
           onClick={() => onPageChange(currentPage - 1)}
           disabled={isFirstPage}
           className={cn(
-            "interaction-transition flex h-12 w-12 cursor-pointer items-center justify-center transition-colors md:h-14 md:w-14",
+            "interaction-transition flex h-12 w-12 cursor-pointer",
+            "items-center justify-center transition-colors",
+            "md:h-14 md:w-14",
             isFirstPage ? "text-white/60" : "text-white",
           )}
           aria-label="Show previous collections"
@@ -319,7 +405,9 @@ function CollectionControls({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={isLastPage}
           className={cn(
-            "interaction-transition flex h-12 w-12 cursor-pointer items-center justify-center transition-colors md:h-14 md:w-14",
+            "interaction-transition flex h-12 w-12 cursor-pointer",
+            "items-center justify-center transition-colors",
+            "md:h-14 md:w-14",
             isLastPage ? "text-white/60" : "text-white",
           )}
           aria-label="Show next collections"
@@ -345,7 +433,9 @@ export function Collection({ data, className }: CollectionProps) {
     Math.max(totalPages - 1, 0),
   );
 
-  if (!hasCollectionContent(data)) return null;
+  if (!hasCollectionContent(data)) {
+    return null;
+  }
 
   function handlePageChange(page: number) {
     if (page < 0 || page >= totalPages) {
