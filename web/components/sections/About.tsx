@@ -201,16 +201,11 @@ function AboutHeadline({
 function AboutImage({ image }: { image?: NonNullable<AboutData>["image"] }) {
   if (!image) return null;
 
-  const imageUrl = urlFor(image)
-    .width(2880)
-    .height(800)
-    .fit("crop")
-    .auto("format")
-    .url();
+  const imageUrl = urlFor(image).width(2880).auto("format").url();
 
   return (
     <motion.div
-      className="relative left-1/2 h-72 w-screen -translate-x-1/2 overflow-hidden bg-zinc-100 md:h-96"
+      className="relative left-1/2 h-[300px] w-screen -translate-x-1/2 overflow-hidden bg-white md:h-[400px]"
       variants={featureImageVariants}
     >
       <Image
@@ -218,7 +213,7 @@ function AboutImage({ image }: { image?: NonNullable<AboutData>["image"] }) {
         alt="About image"
         fill
         sizes="100vw"
-        className="object-cover"
+        className="translate-y-[80px] scale-165 object-cover object-center md:object-[50%_20%] md:scale-150 lg:scale-100 lg:translate-y-0"
       />
     </motion.div>
   );
