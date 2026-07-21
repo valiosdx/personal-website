@@ -11,6 +11,9 @@ import { Collection } from "@/components/sections/Collection";
 import { Contact } from "@/components/sections/Contact";
 import { Footer } from "@/components/layout/Footer";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function HomePage() {
   const homepage = await sanityFetch<Homepage | null>(HOMEPAGE_QUERY);
 
