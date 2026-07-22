@@ -21,11 +21,20 @@ type BrandWithLogo = Omit<BrandItem, "logo"> & {
   logo: NonNullable<BrandItem["logo"]>;
 };
 
+type BrandLogoProps = {
+  brand: BrandWithLogo;
+};
+
+type BrandGroupProps = {
+  brands: BrandWithLogo[];
+  groupIndex: number;
+};
+
 function hasLogo(brand: BrandItem): brand is BrandWithLogo {
   return brand.logo !== undefined && brand.logo !== null;
 }
 
-function BrandLogo({ brand }: { brand: BrandWithLogo }) {
+function BrandLogo({ brand }: BrandLogoProps) {
   const imageUrl = urlFor(brand.logo)
     .width(640)
     .fit("max")
@@ -33,17 +42,26 @@ function BrandLogo({ brand }: { brand: BrandWithLogo }) {
     .url();
 
   const itemClassName =
-    "flex h-[90px] w-[33.333vw] shrink-0 items-center justify-center md:h-[120px] md:w-[25vw] lg:w-[16.666vw]";
+    "flex h-[90px] w-auto shrink-0 items-center justify-center md:h-[120px]";
 
   const logo = (
-    <span className="flex h-[90px] w-full items-center justify-center px-6 md:h-[120px] md:px-10">
+    <span className="flex h-full w-auto shrink-0 items-center justify-center">
       <Image
         src={imageUrl}
         alt={brand.alt || "Brand logo"}
         width={640}
         height={180}
-        sizes="(min-width: 1024px) 16.666vw, (min-width: 768px) 25vw, 33.333vw"
-        className="brand-slider-logo h-auto max-h-[90px] w-auto max-w-full object-contain md:max-h-[120px]"
+        sizes="(min-width: 768px) 280px, 180px"
+        className="
+          brand-slider-logo
+          h-auto
+          max-h-[65px]
+          w-auto
+          max-w-[160px]
+          object-contain
+          md:max-h-[100px]
+          md:max-w-[240px]
+        "
         draggable={false}
       />
     </span>
@@ -66,22 +84,46 @@ function BrandLogo({ brand }: { brand: BrandWithLogo }) {
   return <div className={itemClassName}>{logo}</div>;
 }
 
+function BrandGroup({ brands, groupIndex }: BrandGroupProps) {
+  return (
+    <div
+      className="
+        flex
+        shrink-0
+        items-center
+        gap-10
+        pr-10
+        md:gap-20
+        md:pr-20
+      "
+      aria-hidden={groupIndex > 0}
+    >
+      {brands.map((brand, index) => (
+        <BrandLogo
+          key={`${groupIndex}-${brand._key ?? brand.alt ?? "brand"}-${index}`}
+          brand={brand}
+        />
+      ))}
+    </div>
+  );
+}
+
 const SPEED_PER_ITEM = 4;
 const MINIMUM_DURATION = 8;
 
 export function BrandSlider({ data, className }: BrandSliderProps) {
   const brands: BrandWithLogo[] = (data?.brands ?? []).filter(hasLogo);
 
-  if (!brands.length) return null;
-
-  const duplicatedBrands = [...brands, ...brands];
+  if (!brands.length) {
+    return null;
+  }
 
   const duration = Math.max(brands.length * SPEED_PER_ITEM, MINIMUM_DURATION);
 
   return (
     <section
       className={cn(
-        "relative left-1/2 w-screen -translate-x-1/2 overflow-hidden bg-white py-5 md:py-0 ",
+        "relative left-1/2 w-screen -translate-x-1/2 overflow-hidden bg-white py-5 md:py-0",
         className,
       )}
     >
@@ -95,17 +137,40 @@ export function BrandSlider({ data, className }: BrandSliderProps) {
           willChange: "transform",
         }}
       >
-        {duplicatedBrands.map((brand, index) => (
-          <BrandLogo
-            key={`${brand._key ?? brand.alt ?? "brand"}-${index}`}
-            brand={brand}
-          />
-        ))}
+        <BrandGroup brands={brands} groupIndex={0} />
+
+        <BrandGroup brands={brands} groupIndex={1} />
       </motion.div>
 
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-linear-to-r from-white to-transparent md:w-44" />
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-y-0
+          left-0
+          z-10
+          w-24
+          bg-linear-to-r
+          from-white
+          to-transparent
+          md:w-44
+        "
+      />
 
-      <div className="pointer-events absolute inset-y-0 right-0 z-10 w-24 bg-linear-to-l from-white to-transparent md:w-44" />
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-y-0
+          right-0
+          z-10
+          w-24
+          bg-linear-to-l
+          from-white
+          to-transparent
+          md:w-44
+        "
+      />
     </section>
   );
 }
