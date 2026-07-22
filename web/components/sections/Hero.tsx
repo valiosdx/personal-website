@@ -71,7 +71,7 @@ function HeroTitleBlock({ badge, title }: HeroTitleBlockProps) {
       {title ? (
         <AnimatedHeading
           as="h1"
-          className="max-w-[632px] font-inter text-4xl font-medium uppercase leading-[50.4px] text-[var(--color-base-black)] md:text-5xl md:leading-[67.2px]"
+          className="max-w-full font-inter text-4xl font-medium uppercase leading-[50.4px] text-[var(--color-base-black)] md:text-5xl md:leading-[67.2px]"
         >
           {title}
         </AnimatedHeading>
@@ -88,7 +88,19 @@ function HeroActionBlock({ description, button }: HeroActionBlockProps) {
     >
       {description ? (
         <motion.p
-          className="w-full font-inter text-base font-normal leading-6 text-[var(--color-gray-700)] md:max-w-[482px] md:text-lg md:leading-7"
+          className="
+            w-full
+            font-inter
+            text-base
+            font-normal
+            leading-6
+            text-[var(--color-gray-700)]
+            md:max-w-[482px]
+            md:text-lg
+            md:leading-7
+            lg:max-w-none
+            xl:max-w-[772px]
+          "
           variants={fadeUp}
         >
           {description}
@@ -175,11 +187,10 @@ export function Hero({ data, className }: HeroProps) {
     : null;
 
   return (
-    <Section className={cn("pt-14 pb-6 md:pt-28 md:pb-10 lg:pb-36", className)}>
+    <Section className={cn("pb-6 pt-14 md:pb-10 md:pt-28 xl:pb-36", className)}>
       <Container>
-        {/* Mobile + Tablet */}
         <motion.div
-          className="flex flex-col gap-14 lg:hidden"
+          className="flex flex-col gap-14 xl:hidden"
           variants={staggerContainer}
           initial="hidden"
           animate="show"
@@ -200,9 +211,16 @@ export function Hero({ data, className }: HeroProps) {
           </motion.div>
         </motion.div>
 
-        {/* Desktop */}
+        {/* Desktop: mulai 1280px */}
         <motion.div
-          className="hidden lg:grid lg:grid-cols-[minmax(0,632px)_minmax(240px,482px)] lg:items-end lg:gap-8 xl:gap-16 2xl:gap-32"
+          className="
+          hidden
+          xl:grid
+          xl:grid-cols-[minmax(0,632px)_minmax(240px,482px)]
+          xl:items-end
+          xl:gap-16
+          2xl:gap-32
+        "
           variants={staggerContainer}
           initial="hidden"
           animate="show"
@@ -212,7 +230,6 @@ export function Hero({ data, className }: HeroProps) {
             variants={staggerContainer}
           >
             <HeroTitleBlock badge={data?.badge} title={data?.title} />
-
             <HeroStats stats={stats} />
           </motion.div>
 

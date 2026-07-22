@@ -117,7 +117,7 @@ function ServiceCard({
       <div className="h-px w-full bg-gray-200" aria-hidden="true" />
 
       {service.description ? (
-        <p className="font-inter w-full min-w-0 break-words text-base font-normal leading-[150%] text-[var(--color-gray-900)] [overflow-wrap:anywhere] md:text-xl md:leading-[120%]">
+        <p className="font-inter w-full min-w-0 break-words text-base font-normal leading-[150%] text-[var(--color-gray-700)] [overflow-wrap:anywhere] md:text-xl md:leading-[120%]">
           {service.description}
         </p>
       ) : null}
