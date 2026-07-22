@@ -127,18 +127,23 @@ function ProjectImage({
   project: ProjectItemWithContent;
   variant?: "desktop" | "responsive";
 }) {
+  const imageClassName = cn(
+    "relative shrink-0 overflow-hidden rounded-lg",
+    variant === "desktop" ? "h-16 w-28" : "h-44 w-full md:h-[361px]",
+  );
+
   if (!project.thumbnail) {
     return (
       <div
-        className={cn(
-          "flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50",
-          variant === "desktop" ? "h-16 w-28" : "h-44 w-full md:h-[361px]",
-        )}
-      >
-        <span className="font-inter text-xs font-medium uppercase tracking-[0.08em] text-gray-400">
-          Project
-        </span>
-      </div>
+        role="img"
+        aria-label={`${project.title || "Project"} thumbnail placeholder`}
+        className={imageClassName}
+        style={{
+          backgroundColor: "#e5e7eb",
+          backgroundImage:
+            "repeating-linear-gradient(135deg, transparent 0px, transparent 18px, rgba(255, 255, 255, 0.95) 18px, rgba(255, 255, 255, 0.95) 20px)",
+        }}
+      />
     );
   }
 
@@ -158,12 +163,7 @@ function ProjectImage({
           .url();
 
   return (
-    <div
-      className={cn(
-        "relative shrink-0 overflow-hidden rounded-lg bg-zinc-50",
-        variant === "desktop" ? "h-16 w-28" : "h-44 w-full md:h-[361px]",
-      )}
-    >
+    <div className={cn(imageClassName, "bg-zinc-50")}>
       <Image
         src={imageUrl}
         alt={project.title || "Project thumbnail"}
@@ -182,7 +182,7 @@ function ProjectImage({
 function ProjectRowDesktop({ project }: { project: ProjectItemWithContent }) {
   return (
     <div className="hidden w-full grid-cols-[56px_minmax(0,500px)_96px] items-center justify-between gap-10 border-t border-zinc-200 py-5 lg:grid">
-      <p className="font-inter text-2xl font-normal leading-8 text-black">
+      <p className="font-inter whitespace-nowrap text-2xl font-normal leading-8 text-black">
         {project.year}
       </p>
 
@@ -190,7 +190,7 @@ function ProjectRowDesktop({ project }: { project: ProjectItemWithContent }) {
         <ProjectImage project={project} variant="desktop" />
 
         {project.title ? (
-          <p className="font-inter line-clamp-1 min-w-0 flex-1 text-2xl font-normal leading-8 text-black">
+          <p className="font-inter min-w-0 whitespace-nowrap text-2xl font-normal leading-8 text-black">
             {project.title}
           </p>
         ) : null}
