@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
@@ -14,7 +14,6 @@ import {
   collectionControlsVariants,
   fadeUp,
   staggerContainer,
-  viewportOnce,
 } from "@/lib/motion";
 import { urlFor } from "@/lib/sanity/image";
 import { cn } from "@/lib/utils";
@@ -276,10 +275,12 @@ function CollectionCarousel({
   items,
   currentPage,
   itemsPerPage,
+  isInView,
 }: {
   items: CollectionItemWithContent[];
   currentPage: number;
   itemsPerPage: number;
+  isInView: boolean;
 }) {
   if (!items.length) {
     return null;
@@ -312,6 +313,7 @@ function CollectionCarousel({
       >
         {pages.map((pageItems, page) => {
           const isActivePage = page === currentPage;
+          const shouldShowPage = isInView;
 
           return (
             <div
@@ -325,7 +327,7 @@ function CollectionCarousel({
                 className="flex w-full flex-col items-stretch gap-6 lg:grid lg:grid-cols-3 lg:gap-5"
                 variants={collectionCarouselVariants}
                 initial="hidden"
-                animate="show"
+                animate={shouldShowPage ? "show" : "hidden"}
               >
                 {pageItems.map((item) => (
                   <motion.div
@@ -422,6 +424,14 @@ function CollectionControls({
 export function Collection({ data, className }: CollectionProps) {
   const [activeItemIndex, setActiveItemIndex] = useState(0);
 
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const isInView = useInView(sectionRef, {
+    once: true,
+    amount: 0.1,
+    margin: "0px 0px -15% 0px",
+  });
+
   const itemsPerPage = useItemsPerPage();
 
   const items = data?.items?.filter(hasCollectionItemContent) ?? [];
@@ -447,14 +457,14 @@ export function Collection({ data, className }: CollectionProps) {
 
   return (
     <motion.section
+      ref={sectionRef}
       className={cn(
         "w-full overflow-hidden bg-[var(--color-primary-500)] py-10 md:py-14 lg:py-24",
         className,
       )}
       variants={staggerContainer}
       initial="hidden"
-      whileInView="show"
-      viewport={viewportOnce}
+      animate={isInView ? "show" : "hidden"}
     >
       <Container>
         <div className="flex w-full flex-col items-start gap-10 md:gap-14 lg:gap-24">
@@ -466,6 +476,7 @@ export function Collection({ data, className }: CollectionProps) {
             items={items}
             currentPage={currentPage}
             itemsPerPage={itemsPerPage}
+            isInView={isInView}
           />
 
           {items.length ? (

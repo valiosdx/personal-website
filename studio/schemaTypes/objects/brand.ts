@@ -10,7 +10,7 @@ export const brand = defineType({
       title: 'Logo',
       type: 'image',
       description:
-        'Upload logo Brand diharuskan dengan background transparent, Foramt yang didukung: png, webp, avif, svg',
+        'Upload logo Brand diharuskan dengan background transparent, Format yang didukung: png, webp, avif, svg',
       options: {
         accept: 'image/png, image/webp, image/avif, image/svg+xml',
       },
