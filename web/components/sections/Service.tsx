@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 
 import { AnimatedHeading } from "@/components/ui/AnimatedHeading";
 import { Container } from "@/components/ui/Container";
@@ -83,6 +84,87 @@ function ServiceHeader({ data }: { data?: ServiceData }) {
   );
 }
 
+function ExpandableServiceDescription({
+  description,
+  descriptionId,
+}: {
+  description: string;
+  descriptionId: string;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [hasOverflow, setHasOverflow] = useState(false);
+
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const descriptionElement = descriptionRef.current;
+
+    if (!descriptionElement || isExpanded) {
+      return;
+    }
+
+    function checkOverflow() {
+      if (!descriptionElement) {
+        return;
+      }
+
+      const isOverflowing =
+        descriptionElement.scrollHeight > descriptionElement.clientHeight + 1;
+
+      setHasOverflow(isOverflowing);
+    }
+
+    checkOverflow();
+
+    const resizeObserver = new ResizeObserver(checkOverflow);
+
+    resizeObserver.observe(descriptionElement);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [description, isExpanded]);
+
+  function handleToggle() {
+    setIsExpanded((currentValue) => !currentValue);
+  }
+
+  return (
+    <div className="flex w-full min-w-0 flex-col items-start gap-3">
+      <p
+        ref={descriptionRef}
+        id={descriptionId}
+        className={cn(
+          "font-inter w-full min-w-0 break-words text-base font-normal leading-[150%] text-[var(--color-gray-700)] [overflow-wrap:anywhere] md:text-xl md:leading-[120%]",
+          !isExpanded && "line-clamp-3",
+        )}
+      >
+        {description}
+      </p>
+
+      {hasOverflow || isExpanded ? (
+        <button
+          type="button"
+          onClick={() => setIsExpanded((currentValue) => !currentValue)}
+          className={cn(
+            "interaction-transition font-inter text-sm font-medium",
+            "text-[var(--color-gray-900)] underline",
+            "decoration-[var(--color-gray-500)] underline-offset-4",
+            "transition-colors hover:decoration-[var(--color-gray-900)]",
+            "focus-visible:outline-none focus-visible:ring-2",
+            "focus-visible:ring-[var(--color-gray-700)]",
+            "focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+          )}
+          aria-expanded={isExpanded}
+          aria-controls={descriptionId}
+        >
+          {isExpanded ? "Read Less" : "Read More"}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 function ServiceCard({
   service,
   isFirst = false,
@@ -90,6 +172,8 @@ function ServiceCard({
   service: ServiceItemWithContent;
   isFirst?: boolean;
 }) {
+  const descriptionId = `service-description-${service._key}`;
+
   return (
     <motion.article
       className="flex w-full min-w-0 flex-col items-start gap-5"
@@ -117,9 +201,10 @@ function ServiceCard({
       <div className="h-px w-full bg-gray-200" aria-hidden="true" />
 
       {service.description ? (
-        <p className="font-inter w-full min-w-0 break-words text-base font-normal leading-[150%] text-[var(--color-gray-700)] [overflow-wrap:anywhere] md:text-xl md:leading-[120%]">
-          {service.description}
-        </p>
+        <ExpandableServiceDescription
+          description={service.description}
+          descriptionId={descriptionId}
+        />
       ) : null}
     </motion.article>
   );
