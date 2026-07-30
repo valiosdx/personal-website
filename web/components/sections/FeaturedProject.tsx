@@ -190,7 +190,7 @@ function ProjectRowDesktop({ project }: { project: ProjectItemWithContent }) {
         <ProjectImage project={project} variant="desktop" />
 
         {project.title ? (
-          <p className="font-inter min-w-0 whitespace-nowrap text-2xl font-normal leading-8 text-black">
+          <p className="font-inter min-w-0 flex-1 truncate whitespace-nowrap text-2xl font-normal leading-8 text-black">
             {project.title}
           </p>
         ) : null}
