@@ -123,7 +123,7 @@ export function BrandSlider({ data, className }: BrandSliderProps) {
   return (
     <section
       className={cn(
-        "relative left-1/2 w-screen -translate-x-1/2 overflow-hidden bg-white py-5 md:py-0",
+        "relative w-full max-w-full overflow-hidden bg-white py-5 md:py-0",
         className,
       )}
     >
