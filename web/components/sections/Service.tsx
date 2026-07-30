@@ -47,33 +47,65 @@ function hasServiceContent(data?: ServiceData) {
 function ServiceHeader({ data }: { data?: ServiceData }) {
   return (
     <motion.div
-      className="flex w-full min-w-0 flex-col items-start gap-6 lg:flex-row lg:gap-24"
+      className={cn(
+        "flex w-full min-w-0 flex-col items-start gap-6",
+        "min-[1440px]:flex-row min-[1440px]:gap-[88px]",
+      )}
       variants={staggerContainer}
     >
       {data?.sectionLabel ? (
         <motion.div
-          className="flex w-full min-w-0 items-center gap-3 lg:w-auto lg:shrink-0 lg:py-3"
+          className={cn(
+            "flex w-full min-w-0 items-start py-3",
+            "min-[1440px]:w-28 min-[1440px]:shrink-0",
+          )}
           variants={fadeUp}
         >
-          <p className="font-inter break-words text-xl font-medium uppercase leading-[120%] text-[var(--color-gray-700)] [overflow-wrap:anywhere] md:text-2xl">
+          <p
+            className={cn(
+              "w-full min-w-0 font-inter",
+              "break-words [overflow-wrap:anywhere]",
+              "text-xl font-medium uppercase leading-[120%]",
+              "text-[var(--color-gray-700)]",
+              "md:text-2xl",
+            )}
+          >
             {data.sectionLabel}
           </p>
         </motion.div>
       ) : null}
 
       <motion.div
-        className="flex w-full min-w-0 flex-col items-start gap-5 lg:flex-1"
+        className={cn(
+          "flex w-full min-w-0 flex-col items-start gap-5",
+          "min-[1440px]:w-px min-[1440px]:flex-1",
+        )}
         variants={staggerContainer}
       >
         {data?.title ? (
-          <AnimatedHeading className="font-inter w-full min-w-0 break-words text-[32px] font-normal leading-[140%] text-black [overflow-wrap:anywhere] md:text-[44px] md:leading-[140%] lg:max-w-[571px]">
+          <AnimatedHeading
+            className={cn(
+              "w-full min-w-0 font-inter",
+              "break-words [overflow-wrap:anywhere]",
+              "text-[32px] font-normal leading-[140%] text-black",
+              "md:text-[44px]",
+              "min-[1440px]:w-[55%]",
+            )}
+          >
             {data.title}
           </AnimatedHeading>
         ) : null}
 
         {data?.description ? (
           <motion.p
-            className="font-inter w-full min-w-0 break-words text-base font-normal leading-[150%] text-[var(--color-gray-700)] [overflow-wrap:anywhere] md:max-w-[451px] md:text-lg"
+            className={cn(
+              "w-full min-w-0 font-inter",
+              "break-words [overflow-wrap:anywhere]",
+              "text-base font-normal leading-[150%]",
+              "text-[var(--color-gray-700)]",
+              "md:w-[72%] md:text-lg",
+              "min-[1440px]:w-[40%]",
+            )}
             variants={fadeUp}
           >
             {data.description}
@@ -135,7 +167,11 @@ function ExpandableServiceDescription({
         ref={descriptionRef}
         id={descriptionId}
         className={cn(
-          "font-inter w-full min-w-0 break-words text-base font-normal leading-[150%] text-[var(--color-gray-700)] [overflow-wrap:anywhere] md:text-xl md:leading-[120%]",
+          "w-full min-w-0 font-inter",
+          "break-words [overflow-wrap:anywhere]",
+          "text-base font-normal leading-[140%]",
+          "text-[var(--color-gray-700)]",
+          "md:text-xl",
           !isExpanded && "line-clamp-3",
         )}
       >
@@ -145,7 +181,7 @@ function ExpandableServiceDescription({
       {hasOverflow || isExpanded ? (
         <button
           type="button"
-          onClick={() => setIsExpanded((currentValue) => !currentValue)}
+          onClick={handleToggle}
           className={cn(
             "interaction-transition font-inter text-sm font-medium",
             "text-[var(--color-gray-900)] underline",
@@ -153,7 +189,8 @@ function ExpandableServiceDescription({
             "transition-colors hover:decoration-[var(--color-gray-900)]",
             "focus-visible:outline-none focus-visible:ring-2",
             "focus-visible:ring-[var(--color-gray-700)]",
-            "focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+            "focus-visible:ring-offset-2",
+            "focus-visible:ring-offset-white",
           )}
           aria-expanded={isExpanded}
           aria-controls={descriptionId}
@@ -165,13 +202,7 @@ function ExpandableServiceDescription({
   );
 }
 
-function ServiceCard({
-  service,
-  isFirst = false,
-}: {
-  service: ServiceItemWithContent;
-  isFirst?: boolean;
-}) {
+function ServiceCard({ service }: { service: ServiceItemWithContent }) {
   const descriptionId = `service-description-${service._key}`;
 
   return (
@@ -183,8 +214,11 @@ function ServiceCard({
         {service.number ? (
           <p
             className={cn(
-              "font-inter max-w-full break-words text-base leading-[150%] text-[var(--color-gray-700)] [overflow-wrap:anywhere] md:text-xl md:leading-[120%]",
-              isFirst ? "font-medium" : "font-normal",
+              "max-w-full font-inter",
+              "break-words [overflow-wrap:anywhere]",
+              "text-base font-normal leading-[140%]",
+              "text-[var(--color-gray-700)]",
+              "md:text-xl",
             )}
           >
             {service.number}
@@ -192,7 +226,15 @@ function ServiceCard({
         ) : null}
 
         {service.title ? (
-          <h3 className="font-inter max-w-full break-words text-base font-medium leading-[150%] text-[var(--color-gray-900)] [overflow-wrap:anywhere] md:text-xl md:leading-[120%]">
+          <h3
+            className={cn(
+              "max-w-full font-inter",
+              "break-words [overflow-wrap:anywhere]",
+              "text-base font-medium leading-[140%]",
+              "text-[var(--color-gray-900)]",
+              "md:text-xl",
+            )}
+          >
             {service.title}
           </h3>
         ) : null}
@@ -217,15 +259,18 @@ function ServiceList({ services }: { services: ServiceItemWithContent[] }) {
 
   return (
     <motion.div
-      className="flex w-full min-w-0 flex-col items-start gap-10 md:gap-14 lg:grid lg:grid-cols-[repeat(2,minmax(0,384px))] lg:gap-x-12 lg:gap-y-14 lg:pl-24 xl:gap-x-24 xl:pl-48"
+      className={cn(
+        "grid w-full min-w-0 grid-cols-1",
+        "gap-y-[60px]",
+        "min-[1440px]:grid-cols-2",
+        "min-[1440px]:gap-x-[100px]",
+        "min-[1440px]:pl-[200px]",
+        "min-[1440px]:pr-36",
+      )}
       variants={serviceListVariants}
     >
-      {services.map((service, index) => (
-        <ServiceCard
-          key={service._key}
-          service={service}
-          isFirst={index === 0}
-        />
+      {services.map((service) => (
+        <ServiceCard key={service._key} service={service} />
       ))}
     </motion.div>
   );
@@ -241,7 +286,10 @@ export function Service({ data, className }: ServiceProps) {
   return (
     <motion.section
       className={cn(
-        "w-full overflow-hidden bg-white px-0 pt-10 pb-14 md:pt-14 md:pb-20 lg:py-24",
+        "w-full max-w-full overflow-x-clip bg-white",
+        "pt-10 pb-[60px]",
+        "md:py-[60px]",
+        "min-[1440px]:py-[100px]",
         className,
       )}
       variants={staggerContainer}
@@ -249,12 +297,15 @@ export function Service({ data, className }: ServiceProps) {
       whileInView="show"
       viewport={tallSectionViewportOnce}
     >
-      <Container>
-        <div className="flex w-full min-w-0 flex-col items-center gap-14 md:gap-24">
-          <ServiceHeader data={data} />
+      <Container
+        className={cn(
+          "flex min-w-0 flex-col items-start",
+          "gap-[60px] md:gap-[100px]",
+        )}
+      >
+        <ServiceHeader data={data} />
 
-          <ServiceList services={services} />
-        </div>
+        <ServiceList services={services} />
       </Container>
     </motion.section>
   );
