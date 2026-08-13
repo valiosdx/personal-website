@@ -17,6 +17,8 @@ const interTight = Inter_Tight({
   variable: "--font-inter-tight",
 });
 
+
+
 const fallbackMetadata = {
   siteName: "Ferdi Anggriawan",
   title: "Ferdi Anggriawan",
@@ -53,6 +55,14 @@ export async function generateMetadata(): Promise<Metadata> {
     },
 
     description,
+
+    verification: {
+      google: process.env.GOOGLE_SITE_VERIFICATION,
+    },
+
+    authors: [{ name: siteName, url: metadataBase ? "/" : undefined }],
+    creator: siteName,
+    publisher: siteName,
 
     alternates: metadataBase
       ? {
